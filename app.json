@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MyTestProject",
-    "slug": "MyTestProject",
+    "name": "app-syn-berlin",
+    "slug": "app-syn-berlin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
