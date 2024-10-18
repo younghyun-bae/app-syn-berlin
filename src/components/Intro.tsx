@@ -1,6 +1,29 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import { Link, router } from 'expo-router'
 import styled from 'styled-components/native';
+
+interface IntroProps {}
+
+const Intro: React.FC<IntroProps> = () => {
+  const handlePress = () => {
+    console.log('Navigate to login');
+  };
+
+  return (
+    <Container>
+      <Title>
+        <Logo source={require('../../assets/images/SYN.png')} />
+      </Title>
+      <IntroCopy>
+        Unleash Potential, Connect, and Create in Berlin
+      </IntroCopy>
+      <Button onPress={() => router.push('')}>
+        <ButtonText>Get Started</ButtonText>
+      </Button>
+    </Container>
+  );
+};
 
 const Container = styled.View`
   flex: 1;
@@ -42,26 +65,4 @@ const ButtonText = styled.Text`
   text-align: center;
 `;
 
-interface AppProps {}
-
-const App: React.FC<AppProps> = () => {
-  const handlePress = () => {
-    console.log('Navigate to login');
-  };
-
-  return (
-    <Container>
-      <Title>
-        <Logo source={require('../../assets/images/SYN.png')} />
-      </Title>
-      <IntroCopy>
-        Unleash Potential, Connect, and Create in Berlin
-      </IntroCopy>
-      <Button onPress={handlePress}>
-        <ButtonText>Get Started</ButtonText>
-      </Button>
-    </Container>
-  );
-};
-
-export default App;
+export default Intro;
