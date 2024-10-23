@@ -1,9 +1,11 @@
 import { ScrollView, View, Text, StyleSheet, Image, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-
+import { useRouter } from 'expo-router';
 
 const HomeScreen = () => {
+    const router = useRouter();
+
     const events = [
         { id: '1', image: require('../../assets/images/SYN_lime.png'), description: 'Event Advertisement here' },
         { id: '2', image: require('../../assets/images/SYN_black.png'), description: 'Event 2 Advertisement' },
@@ -53,7 +55,7 @@ const HomeScreen = () => {
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                         <View style={styles.popularItemContainer}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => router.push(`/detail/${item.id}`)}>
                                 <Text style={styles.popularItem}>{item.title}</Text>
                             </TouchableOpacity>
                         </View>
