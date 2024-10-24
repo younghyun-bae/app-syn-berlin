@@ -17,7 +17,9 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
-            <WelcomeText>Welcome, you talent</WelcomeText>
+            <WelcomeText style={{ letterSpacing: -0.5 }}>
+                Welcome, you talent
+            </WelcomeText>
             <AuthContainer>
                 <AuthButton>
                     <AuthIconContainer>
@@ -31,7 +33,9 @@ const LoginScreen = () => {
                 </AuthButton>
             </AuthContainer>
             <Divider />
-            <Text> Or continue with Email</Text>
+            <OrText style={{ letterSpacing: -0.5 }}>
+                Or continue with Email
+            </OrText>
             <EmailContainer>
                 <Input
                     placeholder="Email"
@@ -54,7 +58,9 @@ const LoginScreen = () => {
                 </EyeIconContainer>
             </View>
             <SubmitButton onPress={() => router.push('/(tabs)')}>
-                <SubmitButtonText>Log In</SubmitButtonText>
+                <SubmitButtonText style={{ letterSpacing: -0.5 }}>
+                    Log In
+                </SubmitButtonText>
             </SubmitButton>
             </EmailContainer>
             <JoinText>Don't have an account?</JoinText>
@@ -88,6 +94,7 @@ const styles = StyleSheet.create({
 
     const WelcomeText = styled.Text`
         font-size: 18px;
+        font-family: 'DMSans_700Bold_Italic';
         font-weight: bold;
         margin-bottom: 20px;
     `;
@@ -116,6 +123,10 @@ const styles = StyleSheet.create({
     background-color: #232323;
     width: 80%;
     margin: 20px 0;
+    `;
+
+    const OrText = styled.Text`
+        font-family: 'DMSans_500Medium';
     `;
 
     const EmailContainer = styled.View`
@@ -147,8 +158,9 @@ const styles = StyleSheet.create({
     `;
 
     const SubmitButtonText = styled.Text`
+        font-family: 'DMSans_700Bold';
         color: white;
-        font-size: 16px;
+        font-size: 18px;
     `;
 
     const JoinText = styled.Text`
