@@ -40,6 +40,7 @@ const HomeScreen = () => {
                     keyExtractor={(item) => item.id}
                     horizontal
                     showsHorizontalScrollIndicator={false}
+                    nestedScrollEnabled
                     renderItem={({ item }) => (
                         <View style={styles.eventItem}>
                             <Image source={item.image} style={styles.eventImage} />
@@ -50,18 +51,15 @@ const HomeScreen = () => {
             </View>
             <View style={styles.popularSection}>
                 <Text style={styles.sectionTitle}>Popular</Text>
-                <FlatList
-                    data={popularItems}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <View style={styles.popularItemContainer}>
+                <View style={styles.popularItemsContainer}>
+                    {popularItems.map((item) => (
+                        <View key={item.id} style={styles.popularItemContainer}>
                             <TouchableOpacity onPress={() => router.push(`/detail/${item.id}`)}>
                                 <Text style={styles.popularItem}>{item.title}</Text>
                             </TouchableOpacity>
                         </View>
-                    )}
-                    numColumns={3}
-                />
+                    ))}
+                </View>
             </View>
             <View style={styles.aboutSection}>
                 <Text style={styles.sectionTitle}>About</Text>
@@ -123,14 +121,19 @@ const styles = StyleSheet.create({
     popularSection: {
         marginBottom: 24,
     },
+    popularItemsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
     popularItemContainer: {
         backgroundColor: '#CDDC52',
         borderRadius: 30,
-        margin: 8,
+        margin: 5,
         paddingVertical: 16,
         paddingHorizontal: 12,
         alignItems: 'center',
-        flex: 1,
+        flexBasis: '25%',
     },
     popularItem: {
         fontSize: 14,
