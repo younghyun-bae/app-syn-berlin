@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, StyleSheet, Image, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { FlatList } from 'react-native';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useRouter } from 'expo-router';
@@ -47,18 +47,19 @@ const HomeScreen = () => {
             </SearchBar>
             <Section>
                 <SectionTitle style={{ letterSpacing: -0.5 }}>All Events</SectionTitle>
-                <EventList
+                <FlatList<Event>
                     data={events}
                     keyExtractor={( item ) => item.id}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     nestedScrollEnabled
-                    renderItem={({ item }: { item: Event }) => (
+                    renderItem={({ item }) => (
                         <EventItem>
                             <EventImage source={item.image} />
                             <EventDescription>{item.description}</EventDescription>
                         </EventItem>
                     )}
+                    style={{ marginTop: 12 }}
                 />
             </Section>
             <Section>
