@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet } from 'react-native';
-import { Link, router } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+
+import { loginWithGoogle } from '../api/auth/google';
+import { loginWithFacebook } from '../api/auth/facebook';
+import { loginWithEmail } from '../api/auth/email';
+
 import styled from 'styled-components/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
@@ -10,6 +15,34 @@ const LoginScreen = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [showPassword, setShowPassword] = useState<boolean>(false);
+
+    const handleGoogleLogin = async () => {
+        try {
+            await loginWithGoogle();
+            router.push('/(tabs)');
+        } catch (error) {
+            console.error("Failed to login with Google", error);
+        }
+    };
+
+    const handleFacebookLogin = async () => {
+        try {
+            await loginWithFacebook();
+            router.push('/(tabs)');
+        } catch (error) {
+            console.error("Failed to login with Facebook", error);
+        }
+    };
+
+    const handleEmailLogin = async () => {
+        try {
+            await loginWithEmail(email, password);
+            router.push('/(tabs)');
+        } catch (error) {
+            console.error("Failed to login with Email", error);
+        }
+    };
+
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -21,12 +54,12 @@ const LoginScreen = () => {
                 Welcome, you talent
             </WelcomeText>
             <AuthContainer>
-                <AuthButton>
+                <AuthButton onPress={handleFacebookLogin}>
                     <AuthIconContainer>
                         <FontAwesomeIcon icon={faFacebook} size={32} color="#ffffff" />
                     </AuthIconContainer>
                 </AuthButton>
-                <AuthButton>
+                <AuthButton onPress={handleGoogleLogin}>
                     <AuthIconContainer>
                         <FontAwesomeIcon icon={faGoogle} size={32} color='#ffffff'/>
                     </AuthIconContainer>
@@ -41,27 +74,29 @@ const LoginScreen = () => {
                     placeholder="Email"
                     value={email}
                     onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
                 />
-            <View>
-                <Input 
-                placeholder="Password"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-                />
-                <EyeIconContainer onPress={toggleShowPassword}>
-                <FontAwesomeIcon
-                    icon={showPassword ? faEye : faEyeSlash}
-                    size={20}
-                    color='#5A5A5F'
-                />
-                </EyeIconContainer>
-            </View>
-            <SubmitButton onPress={() => router.push('/(tabs)')}>
-                <SubmitButtonText style={{ letterSpacing: -0.5 }}>
-                    Log In
-                </SubmitButtonText>
-            </SubmitButton>
+                <View>
+                    <Input 
+                    placeholder="Password"
+                    secureTextEntry={!showPassword}
+                    value={password}
+                    onChangeText={setPassword}
+                    />
+                    <EyeIconContainer onPress={toggleShowPassword}>
+                        <FontAwesomeIcon
+                            icon={showPassword ? faEye : faEyeSlash}
+                            size={20}
+                            color='#5A5A5F'
+                        />
+                    </EyeIconContainer>
+                </View>
+                <EmailLoginButton onPress={handleEmailLogin}>
+                    <SubmitButtonText style={{ letterSpacing: -0.5 }}>
+                        Log In
+                    </SubmitButtonText>
+                </EmailLoginButton>
             </EmailContainer>
             <JoinText>Don't have an account?</JoinText>
             <JoinLink onPress={() => console.log('Join!')}>
@@ -148,7 +183,7 @@ const styles = StyleSheet.create({
         top: 39%;
     `;
 
-    const SubmitButton = styled.TouchableOpacity`
+    const EmailLoginButton = styled.TouchableOpacity`
         background-color: #212121;
         padding: 12px;
         align-items: center;

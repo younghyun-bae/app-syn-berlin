@@ -46,7 +46,7 @@ const IntroScreen = () => {
                         Connect, and Create in Berlin
                     </IntroText>
                     <SubmitButton>
-                        <LinkText href="/login"  style={{ letterSpacing: -0.5 }}>
+                        <LinkText href="/login" style={{ letterSpacing: -0.5 }}>
                             Get Started
                         </LinkText>
                     </SubmitButton>

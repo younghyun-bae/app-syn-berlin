@@ -1,13 +1,30 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, Button } from 'react-native';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../../api/firebase';
+import { useAuth } from '../../../api/hooks/useAuth';
 
 const Tab4Screen = () => {
+    const user = useAuth();
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            console.log('User signed out');
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
+    };
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 24 }}>My Profile and Setting</Text>
-            {/* <TouchableOpacity style={{ marginTop: 20 }}>
-                <Link href="/login">Get Started</Link>
-            </TouchableOpacity> */}
+            {user ? (
+                <>
+                    <Text>Welcome, {user.displayName || user.email}</Text>
+                    <Button title="Logout" onPress={handleLogout} />
+                </>
+            ) : (
+                <Text>Loading user data...</Text>
+            )}
         </View>
     );
 };
