@@ -1,18 +1,33 @@
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from 'expo-web-browser';
+import { 
+  GoogleAuthProvider, 
+  signInWithCredential, 
+} from 'firebase/auth';
 import { auth } from '../firebase';
+import {
+  GOOGLE_IOS_CLIENT_ID,
+  GOOGLE_ANDROID_CLIENT_ID
+} from '@env';
+import { useEffect } from 'react';
 
-export const loginWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    await signInWithRedirect(auth, provider);
-    // console.log("Google User: ", result.user);
-    const result = await getRedirectResult(auth);
-    if (result) {
-      console.log("Google User: ", result.user);
-      return result.user;
+WebBrowser.maybeCompleteAuthSession();
+
+export const loginWithGoogle = () => {
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: GOOGLE_IOS_CLIENT_ID,
+    androidClientId: GOOGLE_ANDROID_CLIENT_ID,
+  });
+
+  useEffect(() => {
+    const handleGoogleSignIn = async () => {
+      if (response?.type === "success") {
+        const { id_token } = response.params;
+        const credential = GoogleAuthProvider.credential(id_token);
+        await signInWithCredential(auth, credential);
+      }
     }
-  } catch (error) {
-    console.error("Google login error", error);
-    throw error;
-  }
+    handleGoogleSignIn();
+  }, [response]);
 };

@@ -7,6 +7,7 @@
       "@components/*": ["components/*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"],
     },
+    "typeRoots": ["./node_modules/@types", "./env.d.ts"],
     "noImplicitAny": true,
     "strictNullChecks": true,
     "jsx": "react-native",
@@ -16,7 +17,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "jest", "react-native"]
+    "types": ["node", "jest", "react-native"],
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   "exclude": ["node_modules"]
