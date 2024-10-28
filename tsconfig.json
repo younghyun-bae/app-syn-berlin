@@ -4,10 +4,12 @@
     "strict": true,
     "baseUrl": "./",
     "paths": {
+      "@env": ["./src/types/env.d.ts"],
       "@components/*": ["components/*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"],
+      "@firebase/*": ["src/api/firebase.ts"],
     },
-    "typeRoots": ["./node_modules/@types", "./env.d.ts"],
+    "typeRoots": ["./node_modules/@types", "src/types"],
     "noImplicitAny": true,
     "strictNullChecks": true,
     "jsx": "react-native",

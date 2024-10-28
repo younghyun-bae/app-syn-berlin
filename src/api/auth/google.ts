@@ -7,6 +7,10 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useEffect } from 'react';
+import { 
+  EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+  EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID 
+} from '@env';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -18,8 +22,8 @@ interface UseGoogleAuthReturnType {
 
 export const useGoogleAuth = (): UseGoogleAuthReturnType => {
   const [request, response, googlePromptAsync] = Google.useAuthRequest({
-    iosClientId: '',
-    androidClientId: '',
+    iosClientId: EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    androidClientId: EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   });
 
   useEffect(() => {

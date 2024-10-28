@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 
-import { useGoogleAuth } from '../api/auth/google';
-import { useFacebookAuth } from '../api/auth/facebook';
-import { loginWithEmail } from '../api/auth/email';
+import { useGoogleAuth } from '../src/api/auth/google';
+import { useFacebookAuth } from '../src/api/auth/facebook';
+import { loginWithEmail } from '../src/api/auth/email';
 
 import styled from 'styled-components/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';

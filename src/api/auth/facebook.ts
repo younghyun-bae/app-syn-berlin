@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useEffect } from 'react';
+import { EXPO_PUBLIC_FACEBOOK_APP_ID } from '@env';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -18,7 +19,7 @@ interface UseFacebookAuthReturnType {
 
 export const useFacebookAuth = (): UseFacebookAuthReturnType => {
   const [request, response, facebookPromptAsync] = Facebook.useAuthRequest({
-    clientId: '',
+    clientId: EXPO_PUBLIC_FACEBOOK_APP_ID,
   });
 
   useEffect(() => {

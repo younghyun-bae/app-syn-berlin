@@ -1,8 +1,13 @@
-{
+import 'dotenv/config';
+
+export default {
   "expo": {
     "name": "app-syn-berlin",
     "slug": "app-syn-berlin",
-    "scheme": ["app-syn-berlin", "fb1038031424464248"],
+    "scheme": ["app-syn-berlin"],
+    "facebookScheme": "fb1038031424464248",
+    "facebookDisplayName": "SYN",
+    "facebookAppId": process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
