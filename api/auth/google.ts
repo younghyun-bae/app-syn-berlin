@@ -1,33 +1,41 @@
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from 'expo-web-browser';
+import { AuthRequest, AuthSessionResult } from 'expo-auth-session';
 import { 
   GoogleAuthProvider, 
   signInWithCredential, 
 } from 'firebase/auth';
 import { auth } from '../firebase';
-import {
-  GOOGLE_IOS_CLIENT_ID,
-  GOOGLE_ANDROID_CLIENT_ID
-} from '@env';
 import { useEffect } from 'react';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export const loginWithGoogle = () => {
+interface UseGoogleAuthReturnType {
+  request: AuthRequest | null;
+  response: AuthSessionResult | null;
+  googlePromptAsync: () => Promise<AuthSessionResult | null>;
+}
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    iosClientId: GOOGLE_IOS_CLIENT_ID,
-    androidClientId: GOOGLE_ANDROID_CLIENT_ID,
+export const useGoogleAuth = (): UseGoogleAuthReturnType => {
+  const [request, response, googlePromptAsync] = Google.useAuthRequest({
+    iosClientId: '',
+    androidClientId: '',
   });
 
   useEffect(() => {
-    const handleGoogleSignIn = async () => {
-      if (response?.type === "success") {
-        const { id_token } = response.params;
-        const credential = GoogleAuthProvider.credential(id_token);
-        await signInWithCredential(auth, credential);
+    const signInWithGoogle = async (): Promise<void> => {
+      if (response?.type === "success" && response.params.id_token) {
+        const credential = GoogleAuthProvider.credential(response.params.id_token);
+        try {
+          const googleUserCredential = await signInWithCredential(auth, credential);
+          console.log('Google User: ', googleUserCredential.user);
+        } catch(error) {
+          console.error('Failed Google credential:', error);
+        }
       }
-    }
-    handleGoogleSignIn();
+    };
+    signInWithGoogle();
   }, [response]);
+
+  return { request, response, googlePromptAsync };
 };

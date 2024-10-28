@@ -2,7 +2,7 @@
   "expo": {
     "name": "app-syn-berlin",
     "slug": "app-syn-berlin",
-    "scheme": "app-syn-berlin",
+    "scheme": ["app-syn-berlin", "fb1038031424464248"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 
-import { loginWithGoogle } from '../api/auth/google';
-import { loginWithFacebook } from '../api/auth/facebook';
+import { useGoogleAuth } from '../api/auth/google';
+import { useFacebookAuth } from '../api/auth/facebook';
 import { loginWithEmail } from '../api/auth/email';
 
 import styled from 'styled-components/native';
@@ -12,13 +12,16 @@ import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 const LoginScreen = () => {
+    const { googlePromptAsync } = useGoogleAuth();
+    const { facebookPromptAsync } = useFacebookAuth();
+
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const handleGoogleLogin = async () => {
         try {
-            await loginWithGoogle();
+            await googlePromptAsync();
             router.push('/(tabs)');
         } catch (error) {
             console.error("Failed to login with Google", error);
@@ -27,7 +30,7 @@ const LoginScreen = () => {
 
     const handleFacebookLogin = async () => {
         try {
-            await loginWithFacebook();
+            await facebookPromptAsync();
             router.push('/(tabs)');
         } catch (error) {
             console.error("Failed to login with Facebook", error);
@@ -42,7 +45,6 @@ const LoginScreen = () => {
             console.error("Failed to login with Email", error);
         }
     };
-
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
