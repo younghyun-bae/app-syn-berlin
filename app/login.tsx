@@ -19,21 +19,32 @@ const LoginScreen = () => {
     const [password, setPassword] = useState<string>('');
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
+    const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
+    const [isFacebookLoading, setIsFacebookLoading] = useState<boolean>(false);
+
     const handleGoogleLogin = async () => {
+        if (isGoogleLoading) return;
+        setIsGoogleLoading(true);
         try {
             await googlePromptAsync();
             router.push('/(tabs)');
         } catch (error) {
             console.error("Failed to login with Google", error);
+        } finally {
+            setIsGoogleLoading(false);
         }
     };
 
     const handleFacebookLogin = async () => {
+        if (isFacebookLoading) return;
+        setIsFacebookLoading(true);
         try {
             await facebookPromptAsync();
             router.push('/(tabs)');
         } catch (error) {
             console.error("Failed to login with Facebook", error);
+        } finally {
+            setIsFacebookLoading(false);
         }
     };
 
@@ -56,12 +67,12 @@ const LoginScreen = () => {
                 Welcome, you talent
             </WelcomeText>
             <AuthContainer>
-                <AuthButton onPress={handleFacebookLogin}>
+                <AuthButton onPress={handleFacebookLogin} disabled={isFacebookLoading}>
                     <AuthIconContainer>
                         <FontAwesomeIcon icon={faFacebook} size={32} color="#ffffff" />
                     </AuthIconContainer>
                 </AuthButton>
-                <AuthButton onPress={handleGoogleLogin}>
+                <AuthButton onPress={handleGoogleLogin} disabled={isGoogleLoading}>
                     <AuthIconContainer>
                         <FontAwesomeIcon icon={faGoogle} size={32} color='#ffffff'/>
                     </AuthIconContainer>
