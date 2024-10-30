@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { router } from 'expo-router';
 
 import { useGoogleAuth } from '../src/api/auth/google';
@@ -28,10 +28,16 @@ const LoginScreen = () => {
         if (isGoogleLoading) return;
         setIsGoogleLoading(true);
         try {
-            await googlePromptAsync();
-            router.push('/(tabs)');
+            const result = await googlePromptAsync();
+            
+            if (result && result.type === 'success') {
+                router.push('/(tabs)');
+            } else {
+                Alert.alert("Google Login Failed", "Login was cancelled or failed.\nPlease try again.");
+            }
         } catch (error) {
             console.error("Failed to login with Google", error);
+            Alert.alert("Google Login failed", "An error occurred.\nPlease reopen the app and try again.");
         } finally {
             setIsGoogleLoading(false);
         }
@@ -41,10 +47,15 @@ const LoginScreen = () => {
         if (isFacebookLoading) return;
         setIsFacebookLoading(true);
         try {
-            await facebookPromptAsync();
-            router.push('/(tabs)');
+            const result = await facebookPromptAsync();
+            if (result && result.type === 'success') {
+                router.push('/(tabs)');
+            } else {
+                Alert.alert("Facebook Login Failed", "Login was cancelled or failed.\nPlease try again.")
+            }
         } catch (error) {
             console.error("Failed to login with Facebook", error);
+            Alert.alert("Facebook Login failed", "An error occurred.\nPlease reopen the app and try again.");
         } finally {
             setIsFacebookLoading(false);
         }
@@ -56,6 +67,7 @@ const LoginScreen = () => {
             router.push('/(tabs)');
         } catch (error) {
             console.error("Failed to login with Email", error);
+            Alert.alert("Email Login failed", "Please check your email address and password are correct, and try again.");
         }
     };
 
@@ -64,8 +76,10 @@ const LoginScreen = () => {
             await emailResister(email, password);
             console.log("Registration successful, redirecting to login...");
             setIsRegistering(false);
+            Alert.alert("Sign Up success", "Please Login with your registerd Email.");
         } catch (error) {
             console.error("Failed to register with Email", error);
+            Alert.alert("Sign Up Failed", "An error occurred during email registeration. Please try again or use a different method.");
         }
     };    
 
