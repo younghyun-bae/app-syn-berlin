@@ -5,7 +5,8 @@ import {
   FacebookAuthProvider, 
   signInWithCredential 
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 import { useEffect } from 'react';
 import { EXPO_PUBLIC_FACEBOOK_APP_ID } from '@env';
 
@@ -28,6 +29,18 @@ export const useFacebookAuth = (): UseFacebookAuthReturnType => {
         const credential = FacebookAuthProvider.credential(response.params.id_token);
         try {
           const facebookUserCredential = await signInWithCredential(auth, credential);
+
+          const user = facebookUserCredential.user;
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+
+          if (!userDoc.exists()) {
+            await setDoc(doc(db, "users", user.uid), {
+              uid: user.displayName,
+              email: user.email,
+              displayName: user.displayName || user.email,
+            });
+          }
+
           console.log('Facebook User: ', facebookUserCredential.user);
         } catch(error) {
           console.error('Failed Facebook credential: ', error);

@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 
 import { useGoogleAuth } from '../src/api/auth/google';
 import { useFacebookAuth } from '../src/api/auth/facebook';
-import { loginWithEmail } from '../src/api/auth/email';
+import { loginWithEmail, emailResister } from '../src/api/auth/email';
 
 import styled from 'styled-components/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -21,6 +21,8 @@ const LoginScreen = () => {
 
     const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
     const [isFacebookLoading, setIsFacebookLoading] = useState<boolean>(false);
+
+    const [isRegistering, setIsRegistering] = useState<boolean>(false);    
 
     const handleGoogleLogin = async () => {
         if (isGoogleLoading) return;
@@ -57,15 +59,26 @@ const LoginScreen = () => {
         }
     };
 
+    const handleEmailRegister = async () => {
+        try {
+            await emailResister(email, password);
+            console.log("Registration successful, redirecting to login...");
+            setIsRegistering(false);
+        } catch (error) {
+            console.error("Failed to register with Email", error);
+        }
+    };    
+
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
-
+    
     return (
         <View style={styles.container}>
             <WelcomeText style={{ letterSpacing: -0.5 }}>
                 Welcome, you talent
             </WelcomeText>
+
             <AuthContainer>
                 <AuthButton onPress={handleFacebookLogin} disabled={isFacebookLoading}>
                     <AuthIconContainer>
@@ -78,6 +91,9 @@ const LoginScreen = () => {
                     </AuthIconContainer>
                 </AuthButton>
             </AuthContainer>
+            <OrText style={{ letterSpacing: -0.5 }}>
+                Choose your account
+            </OrText>
             <Divider />
             <OrText style={{ letterSpacing: -0.5 }}>
                 Or continue with Email
@@ -112,7 +128,7 @@ const LoginScreen = () => {
                 </EmailLoginButton>
             </EmailContainer>
             <JoinText>Don't have an account?</JoinText>
-            <JoinLink onPress={() => console.log('Join!')}>
+            <JoinLink onPress={handleEmailRegister}>
                 Join Berlin's Creative Hub
             </JoinLink>
     </View>

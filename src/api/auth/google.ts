@@ -5,7 +5,8 @@ import {
   GoogleAuthProvider, 
   signInWithCredential, 
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 import { useEffect } from 'react';
 import { 
   EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
@@ -30,8 +31,22 @@ export const useGoogleAuth = (): UseGoogleAuthReturnType => {
     const signInWithGoogle = async (): Promise<void> => {
       if (response?.type === "success" && response.params.id_token) {
         const credential = GoogleAuthProvider.credential(response.params.id_token);
+
         try {
           const googleUserCredential = await signInWithCredential(auth, credential);
+
+          const user = googleUserCredential.user;
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+
+          if (!userDoc.exists()) {
+            // Create a new user profile if none exists
+            await setDoc(doc(db, "users", user.uid), {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName || user.email,
+            });
+          }
+
           console.log('Google User: ', googleUserCredential.user);
         } catch(error) {
           console.error('Failed Google credential:', error);
