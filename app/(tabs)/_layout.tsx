@@ -1,7 +1,8 @@
-import { Stack, Tabs } from 'expo-router';
+import { Stack, Tabs, router } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBookmark, faMessage, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faGlobe, faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faHouse, faGear } from '@fortawesome/free-solid-svg-icons';
 
 const HomeLayout = () => {
   return (
@@ -44,6 +45,18 @@ const HomeLayout = () => {
           headerTitle: "My Profile",
           title: "My",
           tabBarIcon: ({ color }) => <FontAwesomeIcon size={16} icon={faUser} color={color} />,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push('/tab_4/settings')}
+              style={{
+                marginRight: 16,
+                padding: 8,
+                borderRadius: 50,
+              }}
+            >
+              <FontAwesomeIcon icon={faGear} size={20} color="#232323" />
+            </TouchableOpacity>
+          ),
         }}
       />
     </Tabs>

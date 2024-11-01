@@ -9,6 +9,24 @@ const Tab4Layout = () => {
           headerShown: false,
         }} 
       />
+      <Stack.Screen 
+        name="settings"
+        options={{               
+          presentation: 'modal',
+          gestureDirection: 'horizontal',
+          headerShown: true,
+          headerTitle: "Settings"
+        }}
+      />
+      <Stack.Screen 
+        name="editProfile" 
+        options={{ 
+          presentation: 'modal',
+          gestureDirection: 'vertical',
+          headerShown: true,
+          headerTitle: "Edit Profile"
+        }} 
+      />
     </Stack>
   );
 };
