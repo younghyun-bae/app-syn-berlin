@@ -19,6 +19,7 @@
     "@react-native-firebase/app": "^21.2.0",
     "@react-native-firebase/auth": "^21.2.0",
     "@react-native-google-signin/google-signin": "^13.1.0",
+    "@react-native-picker/picker": "2.7.5",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "dotenv": "^16.4.5",
@@ -44,8 +45,7 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "^15.2.0",
     "react-native-web": "~0.19.10",
-    "react-native-webview": "^13.12.3",
-    "@react-native-picker/picker": "2.7.5"
+    "react-native-webview": "^13.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
