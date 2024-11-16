@@ -1,14 +1,9 @@
 module.exports = {
   preset: 'jest-expo',
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-  },
-  setupFilesAfterEnv: ['./jest.setup.js'],
-  testPathIgnorePatterns: ['/node_modules/', '/.expo/'],
-  moduleNameMapper: {
-    '\\.svg': '<rootDir>/__mocks__/svgMock.js',
-  },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'node',
   transformIgnorePatterns: [
-    'node_modules/(?!(@react-native|expo|expo-modules-core)/)',
+    'node_modules/(?!(jest-)?react-native|expo(nent)?|@expo(nent)?/.*|firebase|@firebase)'
   ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json']
 };
