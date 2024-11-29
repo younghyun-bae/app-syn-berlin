@@ -4,6 +4,8 @@
 
 - React Native Testing library + Jest
 
+![syn-wireframe](https://github.com/user-attachments/assets/63817bc6-25ac-4d24-a1e1-9984cf700e78)
+
 ## Why this stack?
 
 > Before reaching this stage, we went through [this process](https://github.com/younghyun-bae/ui-syn-berlin),
