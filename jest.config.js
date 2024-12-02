@@ -1,9 +1,7 @@
 module.exports = {
-  preset: 'jest-expo',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testEnvironment: 'node',
+  preset: 'react-native',
+  setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
   transformIgnorePatterns: [
-    'node_modules/(?!(jest-)?react-native|expo(nent)?|@expo(nent)?/.*|firebase|@firebase)'
+    'node_modules/(?!(jest-)?react-native|@react-native|@react-navigation)',
   ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json']
 };
