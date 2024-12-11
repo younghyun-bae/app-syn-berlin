@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
 import { db } from '../../src/api/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 
 export default function PostScreen() {
   const [title, setTitle] = useState<string>('');
@@ -25,21 +25,30 @@ export default function PostScreen() {
   };
 
   return (
-    <View>
-      <TextInput
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
-        style={{ borderWidth: 1, padding: 8 }}
+    <>
+      <Stack.Screen 
+        options={{
+          headerTitle: 'Create a post',
+          headerBackTitle: 'List',
+        }}
       />
-      <TextInput
-        placeholder="Contents"
-        value={content}
-        onChangeText={setContent}
-        style={{ borderWidth: 1, padding: 8, height: 100 }}
-        multiline
-      />
-      <Button title="Add more post" onPress={handleSubmit} />
-    </View>
+      <View>
+        <TextInput
+          placeholder="Title"
+          value={title}
+          onChangeText={setTitle}
+          style={{ borderWidth: 1, padding: 8 }}
+        />
+        <TextInput
+          placeholder="Contents"
+          value={content}
+          onChangeText={setContent}
+          style={{ borderWidth: 1, padding: 8, height: 100 }}
+          multiline
+        />
+        <Button title="Add" onPress={handleSubmit} />
+      </View>
+    </>
+
   );
 }

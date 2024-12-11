@@ -29,9 +29,9 @@ const HomeScreen = () => {
 
     const popularItems: PopularItem[] = [
         { id: '1', title: 'Hiring', link: '' },
-        { id: '2', title: '1 : 1 Collaboration' },
+        { id: '2', title: '1 : 1\nCollaboration' },
         { id: '3', title: 'Threads' },
-        { id: '4', title: 'Working Space' },
+        { id: '4', title: 'Working\nSpace' },
         { id: '5', title: 'Challenges' },
         { id: '6', title: 'Meetups' },
     ];
@@ -69,7 +69,7 @@ const HomeScreen = () => {
                         <PopularItemContainer 
                         key={item.id}
                         backgroundColor={index % 2 === 0 ? '#CDDC52' : '#B8ADE0'}
-                        onPress={() => router.push(`/detail/${item.id}`)}
+                        onPress={() => router.push('/(tabs)/threads')}
                         >
                             <PopularItemText style={{ letterSpacing: -0.5 }}>{item.title}</PopularItemText>  
                         </PopularItemContainer>

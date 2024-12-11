@@ -1,9 +1,8 @@
-// app/detail/threads.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native';
 import { db } from '../../src/api/firebase';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 
 interface Post {
   id: string;
@@ -47,13 +46,21 @@ export default function ThreadScreen() {
   );
 
   return (
-    <View>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+    <>
+      <Stack.Screen options={{ 
+        headerTitle: 'Threads',
+        headerBackTitleVisible: false,
+        }}
       />
-      <Button title="Post" onPress={() => router.push('/detail/post')} />
-    </View>
+      <View>
+        <FlatList
+          data={posts}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+        <Button title="Create a post" onPress={() => router.push('/detail/post')} />
+      </View>
+    </>
+
   );
 }

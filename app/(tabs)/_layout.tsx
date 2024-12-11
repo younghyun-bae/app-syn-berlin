@@ -59,6 +59,12 @@ const HomeLayout = () => {
           ),
         }}
       />
+      <Tabs.Screen 
+        name='threads'
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList } from 'react-native';
 import { db } from '../../src/api/firebase';
 import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from 'firebase/firestore';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, Stack } from 'expo-router';
 
 interface Comment {
   id: string;
@@ -51,13 +51,20 @@ export default function PostDetailScreen() {
   };
 
   return (
-    <View>
-      {post && (
-        <View>
-          <Text style={{ fontSize: 22 }}>{post.title}</Text>
-          <Text>{post.content}</Text>
-        </View>
-      )}
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: 'Detail',
+          headerBackTitle: 'List',
+        }}
+      />
+      <View>
+        {post && (
+          <View>
+            <Text style={{ fontSize: 22 }}>{post.title}</Text>
+            <Text>{post.content}</Text>
+          </View>
+        )}
       <FlatList
         data={comments}
         renderItem={({ item }) => (
@@ -73,7 +80,9 @@ export default function PostDetailScreen() {
         onChangeText={setNewComment}
         style={{ borderWidth: 1, padding: 8 }}
       />
-      <Button title="Add more comment" onPress={handleAddComment} />
+      <Button title="Add a comment" onPress={handleAddComment} />
     </View>
+    </>
+
   );
 }
