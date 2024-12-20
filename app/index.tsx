@@ -1,65 +1,8 @@
-import React, { useCallback } from 'react';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import { 
-    DMSans_400Regular, 
-    DMSans_400Regular_Italic, 
-    DMSans_500Medium, 
-    DMSans_500Medium_Italic, 
-    DMSans_700Bold, 
-    DMSans_700Bold_Italic 
-} from '@expo-google-fonts/dm-sans';
-import styled, { ThemeProvider } from 'styled-components/native';
+import React from 'react';
+import IntroScreen from '../src/components/intro/IntroScreen';
 
-import Logo from '../src/components/intro/Logo';
-import IntroTextSection from '../src/components/intro/IntroTextSection';
-import SubmitBtn from '../src/components/intro/SubmitBtn';
-
-SplashScreen.preventAutoHideAsync();
-
-const IntroScreen = () => {
-    const [fontsLoaded] = useFonts({
-        DMSans_400Regular,
-        DMSans_400Regular_Italic,
-        DMSans_500Medium,
-        DMSans_500Medium_Italic,
-        DMSans_700Bold,
-        DMSans_700Bold_Italic,
-    });
-
-    const onLayoutRootView = useCallback(async () => {
-        if (fontsLoaded) {
-            await SplashScreen.hideAsync();
-        }
-    }, [fontsLoaded]);
-
-    if (!fontsLoaded) {
-        return null;
-    }
-
-    return (
-        <ThemeProvider theme={{ fontFamily: 'DMSans_400Regular' }}>
-            <Container onLayout={onLayoutRootView}>
-                <Logo />
-                <StartContainer>
-                    <IntroTextSection />
-                    <SubmitBtn />
-                </StartContainer>
-            </Container>
-        </ThemeProvider>
-    );
+const Intro = () => {
+  return <IntroScreen />;
 };
 
-const Container = styled.View`
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    background-color: #CDDC52;
-`;
-
-const StartContainer = styled.View`
-    width: 320px;
-    align-items: center;
-`;
-
-export default IntroScreen;
+export default Intro;
