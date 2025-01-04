@@ -6,7 +6,8 @@
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest --watch"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.2.3",
@@ -47,11 +48,18 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.26.0",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@testing-library/jest-native": "^5.1.2",
+    "@testing-library/react-native": "^12.9.0",
     "@types/jest": "^29.5.13",
     "@types/react": "~18.2.45",
     "@types/react-native-dotenv": "^0.2.2",
+    "babel-jest": "^29.7.0",
     "react-native-dotenv": "^3.4.11",
+    "react-test-renderer": "^18.2.0",
     "styled-components": "^6.1.13",
     "typescript": "~5.3.3"
   },
