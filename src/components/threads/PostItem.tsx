@@ -21,15 +21,16 @@ interface PostItemProps {
   onLike: (postId: string, currentLikes: number, likedByUser: boolean) => void;
   formatDate: (date: Date) => string;
   index: number;
+  testID?: string;
 }
 
-const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index }) => {
+const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, testID }) => {
   const router = useRouter();
 
   return (
-    <PostContainer style={index === 0 ? { marginTop: 20 } : {}}>
+    <PostContainer style={index === 0 ? { marginTop: 20 } : {}} testID={testID}>
       <PostHeader>
-        <Likes onPress={() => onLike(post.id, post.likes, post.likedByUser || false)}>
+        <Likes onPress={() => onLike(post.id, post.likes, post.likedByUser || false)} testID={`like-button-${index}`}>
           <FontAwesomeIcon
             icon={faHeart}
             color={post.likedByUser ? '#CDDC52' : '#C6C6C6'}

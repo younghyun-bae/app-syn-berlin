@@ -4,11 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faPenNib } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'expo-router';
 
-const CreateButton: React.FC = () => {
+interface CreateBtnProps {
+  testID?: string;
+}
+
+const CreateButton: React.FC<CreateBtnProps> = ({ testID }) => {
   const router = useRouter();
 
   return (
-    <Button onPress={() => router.push('/detail/post')}>
+    <Button onPress={() => router.push('/detail/post')} testID={testID}>
       <FontAwesomeIcon icon={faPenNib} color="#FFFFFF" size={25} />
     </Button>
   );
