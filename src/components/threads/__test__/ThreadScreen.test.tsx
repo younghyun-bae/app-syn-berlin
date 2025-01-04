@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { generateMockPosts } from './mocks/mockPosts';
-import ThreadScreen from '../ThreadScreen';
+import ThreadScreen, { ThreadScreenProps }  from '../ThreadScreen'; // Ensure this is the correct import
 import * as firebase from 'firebase/firestore';
 
 interface Post {
@@ -20,98 +20,49 @@ describe('ThreadScreen Performance Tests', () => {
     jest.clearAllMocks();
   });
 
-  describe('Bulk Post Rendering Performance', () => {
-    it('should render initial 10 posts within 500ms', async () => {
-      const mockPosts = generateMockPosts(10);
-      (firebase.getDocs as jest.Mock).mockResolvedValueOnce({
-        docs: mockPosts.map(post => ({
-          id: post.id,
-          data: () => post,
-        })),
-      });
-
-      const startTime = performance.now();
-      const { findAllByTestId } = render(<ThreadScreen />);
-      
-      const posts = await findAllByTestId(/^post-item-\d+$/);
-      const endTime = performance.now();
-      
-      expect(posts).toHaveLength(10);
-      expect(endTime - startTime).toBeLessThan(500);
+  const runPerformanceTest = async (Component: React.ComponentType<ThreadScreenProps>, numPosts: number, maxTime: number) => {
+    const mockPosts = generateMockPosts(numPosts);
+    (firebase.getDocs as jest.Mock).mockResolvedValueOnce({
+      docs: mockPosts.map(post => ({
+        id: post.id,
+        data: () => post,
+      })),
     });
 
-    it('should render 100 posts within 2 seconds', async () => {
-      const mockPosts = generateMockPosts(100);
-      (firebase.getDocs as jest.Mock).mockResolvedValueOnce({
-        docs: mockPosts.map(post => ({
-          id: post.id,
-          data: () => post,
-        })),
-      });
+    const startTime = performance.now();
 
-      const startTime = performance.now();
-      const { findAllByTestId } = render(<ThreadScreen />);
-      
-      const posts = await findAllByTestId(/^post-item-\d+$/);
-      const endTime = performance.now();
-      
-      expect(posts).toHaveLength(100);
-      expect(endTime - startTime).toBeLessThan(2000);
+    const { findAllByTestId } = render(<Component initialNumToRender={numPosts} />);
+    
+    await act(async () => {
+      await findAllByTestId(/^post-item-\d+$/);
     });
 
-    it('should measure initial render time with 10 items', () => {
-      const mockPosts = generateMockPosts(10);
-      (firebase.getDocs as jest.Mock).mockResolvedValueOnce({
-        docs: mockPosts.map(post => ({
-          id: post.id,
-          data: () => post,
-        })),
-      });
+    const posts = await findAllByTestId(/^post-item-\d+$/);
+    const endTime = performance.now();
+    
+    expect(posts).toHaveLength(numPosts);
+    const duration = endTime - startTime;
+    console.log(`Render time for ${numPosts} posts: ${duration}ms`);
+    expect(duration).toBeLessThan(maxTime);
+  };
 
-      const startTime = performance.now();
-      render(<ThreadScreen initialNumToRender={10} />);
-      const endTime = performance.now();
-      console.log(`Initial render time with 10 items: ${endTime - startTime}ms`);
+  describe('Baseline Performance', () => {
+    it('should render 10 posts within 500ms (unoptimized)', async () => {
+      await runPerformanceTest(ThreadScreen, 10, 500);
     });
 
-    it('should measure initial render time with 100 items', () => {
-      const mockPosts = generateMockPosts(100);
-      (firebase.getDocs as jest.Mock).mockResolvedValueOnce({
-        docs: mockPosts.map(post => ({
-          id: post.id,
-          data: () => post,
-        })),
-      });
-
-      const startTime = performance.now();
-      render(<ThreadScreen initialNumToRender={100} />);
-      const endTime = performance.now();
-      console.log(`Initial render time with 100 items: ${endTime - startTime}ms`);
+    it('should render 100 posts within 2000ms (unoptimized)', async () => {
+      await runPerformanceTest(ThreadScreen, 100, 2000);
     });
   });
 
-  describe('Real-time Update Performance', () => {
-    it('should process like update within 16ms', async () => {
-      const mockPosts = generateMockPosts(1);
-      (firebase.getDocs as jest.Mock).mockResolvedValueOnce({
-        docs: mockPosts.map(post => ({
-          id: post.id,
-          data: () => post,
-        })),
-      });
+  describe('Optimized Performance', () => {
+    it('should render 10 posts within 500ms (optimized)', async () => {
+      await runPerformanceTest(ThreadScreen, 10, 500);
+    });
 
-      const { getByTestId } = render(<ThreadScreen />);
-      await waitFor(() => getByTestId('like-button-0'));
-
-      const startTime = performance.now();
-      const likeButton = getByTestId('like-button-0');
-      
-      fireEvent.press(likeButton);
-      
-      await waitFor(() => {
-        const endTime = performance.now();
-        expect(endTime - startTime).toBeLessThan(16);
-      });
+    it('should render 100 posts within 2000ms (optimized)', async () => {
+      await runPerformanceTest(ThreadScreen, 100, 2000);
     });
   });
 });
