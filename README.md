@@ -4,6 +4,8 @@
 
 - React Native Testing library + Jest
 
+- Jira (my project management [status](https://younghyun-bae.atlassian.net/jira/software/projects/SYN/boards/2/backlog?atlOrigin=eyJpIjoiYmRmN2Y3NTVmMDdiNGZkODg1ZDY0Y2VhNDljZTA2ODIiLCJwIjoiaiJ9))
+
 ![syn-wireframe](https://github.com/user-attachments/assets/63817bc6-25ac-4d24-a1e1-9984cf700e78)
 
 ## Why this stack?
@@ -49,8 +51,25 @@ As the platform handles personal data, ensuring strong security, legal protectio
 
 ## 📟 Getting Started
 
+```Bash
+# install iOS and Android native build package
+expo prebuild
+
+# /ios
+pod install
 ```
-npm start
+
+```ruby
+# add 3 liens in /ios/Podfile to resolve compatibility issues
+
+use_modular_headers!
+
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+```
+
+```Bash
+npm start -c
 
 › Press i │ open iOS simulator
 › Press a │ open Android emulator
