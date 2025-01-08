@@ -19,7 +19,7 @@ This stack was carefully selected **to create a modern, scalable, and developer-
 - [Firebase](https://firebase.google.com): Provides authentication, real-time database, and serverless backend support, reducing complexity, letting us focus on the app’s features and user experience.
 - [TypeScript](https://www.typescriptlang.org): Enhances code quality and readability with type safety, catching errors early.
 - [Styled Components](https://styled-components.com): Modern, scoped styling with dynamic theming for a clean, maintainable UI, helping make the codebase more semantic by allowing to assign meaningful names to components, even in React Native, where tags like `View`, `Text`, and `Image` often repeat.
-- [Jest](https://jestjs.io): Ensures reliable and fast testing with support for unit, integration, and snapshot tests.
+- [Jest](https://jestjs.io): Ensures reliable and fast testing with support for unit, integ?).ration, and snapshot tests([How to do TDD](https://github.com/younghyun-bae/tdd-exercise))
 
 Together, this stack offers a fast, efficient workflow and a solid foundation for building scalable mobile applications.
 
@@ -52,16 +52,17 @@ As the platform handles personal data, ensuring strong security, legal protectio
 ## 📟 Getting Started
 
 ```Bash
+npm install
+
 # install iOS and Android native build package
 expo prebuild
 
-# /ios
+cd ios
 pod install
 ```
 
 ```ruby
-# add 3 liens in /ios/Podfile to resolve compatibility issues
-
+# add in /ios/Podfile to resolve compatibility issues
 use_modular_headers!
 
   use_frameworks! :linkage => :static
@@ -69,7 +70,9 @@ use_modular_headers!
 ```
 
 ```Bash
-npm start -c
+cd app-syn-berlin
+
+npm start --clear
 
 › Press i │ open iOS simulator
 › Press a │ open Android emulator
