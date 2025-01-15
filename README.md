@@ -10,7 +10,7 @@
 
 ## Why this stack?
 
-> Before reaching this stage, we went through [this process](https://github.com/younghyun-bae/ui-syn-berlin),
+> Before reaching this stage, I went through [this process](https://github.com/younghyun-bae/ui-syn-berlin),
 
 This stack was carefully selected **to create a modern, scalable, and developer-friendly mobile application**. Each technology plays a unique role in ensuring the app is **robust, maintainable, and user-friendly**.
 
@@ -19,7 +19,7 @@ This stack was carefully selected **to create a modern, scalable, and developer-
 - [Firebase](https://firebase.google.com): Provides authentication, real-time database, and serverless backend support, reducing complexity, letting us focus on the app’s features and user experience.
 - [TypeScript](https://www.typescriptlang.org): Enhances code quality and readability with type safety, catching errors early.
 - [Styled Components](https://styled-components.com): Modern, scoped styling with dynamic theming for a clean, maintainable UI, helping make the codebase more semantic by allowing to assign meaningful names to components, even in React Native, where tags like `View`, `Text`, and `Image` often repeat.
-- [Jest](https://jestjs.io): Ensures reliable and fast testing with support for unit, integ?).ration, and snapshot tests([How to do TDD](https://github.com/younghyun-bae/tdd-exercise))
+- [Jest](https://jestjs.io): Ensures reliable and fast testing with support for unit, integration, and snapshot tests([How to do TDD](https://github.com/younghyun-bae/tdd-exercise))
 
 Together, this stack offers a fast, efficient workflow and a solid foundation for building scalable mobile applications.
 
