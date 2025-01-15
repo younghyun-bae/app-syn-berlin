@@ -60,7 +60,7 @@ export default function PostDetailScreen() {
       <Stack.Screen
         options={{
           headerTitle: 'Detail',
-          headerBackTitle: 'List',
+          headerBackTitle: 'Threads',
         }}
       />
       <Container>
@@ -75,5 +75,5 @@ export default function PostDetailScreen() {
 const Container = styled.View`
   flex: 1;
   background-color: #f7f7f7;
-  padding: 20px;
+  padding: 0 0 20px 0;
 `;

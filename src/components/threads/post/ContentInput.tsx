@@ -28,12 +28,12 @@ const ContentInput: React.FC<ContentInputProps> = ({ value, onChangeText, isFocu
 export default ContentInput;
 
 const StyledContentInput = styled.TextInput<{ isFocused: boolean }>`
-  width: 240px;
+  width: 280px;
   height: 280px;
   border-width: ${({ isFocused }) => (isFocused ? '2px' : '1px')};
   border-color: ${({ isFocused }) => (isFocused ? '#9082C3' : '#232323')};
   border-radius: 20px;
-  padding: 8px;
+  padding: 12px;
   text-align-vertical: top;
   margin-bottom: 10px;
 `;

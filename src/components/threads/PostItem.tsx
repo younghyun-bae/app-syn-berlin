@@ -30,6 +30,7 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
   return (
     <PostContainer style={index === 0 ? { marginTop: 20 } : {}} testID={testID}>
       <PostHeader>
+        <Title numberOfLines={1}>{post.title}</Title>
         <Likes onPress={() => onLike(post.id, post.likes, post.likedByUser || false)} testID={`like-button-${index}`}>
           <FontAwesomeIcon
             icon={faHeart}
@@ -39,9 +40,8 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
         </Likes>
       </PostHeader>
       <TouchableOpacity onPress={() => router.push(`/detail/postDetail?postId=${post.id}`)}>
-        <Title>{post.title}</Title>
         <AuthorName>{post.author}</AuthorName>
-        <Content>{post.content}</Content>
+        <Content numberOfLines={2}>{post.content}</Content>
       </TouchableOpacity>
       <PostFooter>
         <Replies>{post.replies} replies</Replies>
@@ -53,13 +53,11 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
 
 export default PostItem;
 
-// Styled Components
 const PostContainer = styled.View`
   background-color: #ffffff;
   max-height: 150px;
   margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 10px 20px;
   shadow-color: #000;
   shadow-opacity: 0.1;
   shadow-radius: 4px;
@@ -68,9 +66,8 @@ const PostContainer = styled.View`
 
 const PostHeader = styled.View`
   flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Likes = styled.TouchableOpacity`
@@ -87,14 +84,16 @@ const LikesText = styled.Text`
 const Title = styled.Text`
   font-size: 14px;
   color: #393B65;
-  margin-bottom: 5px;
   font-weight: bold;
+  flex: 1;
+  margin-right: 10px;
+  overflow: hidden;
 `;
 
 const AuthorName = styled.Text`
   font-size: 10px;
   color: #7C7C7C;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 `;
 
 const Content = styled.Text`

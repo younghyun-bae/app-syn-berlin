@@ -3,13 +3,15 @@ import styled from 'styled-components/native';
 
 interface PostDetailProps {
   title: string;
+  author: string;
   content: string;
 }
 
-const PostDetail: React.FC<PostDetailProps> = ({ title, content }) => {
+const PostDetail: React.FC<PostDetailProps> = ({ author, title, content }) => {
   return (
     <PostContainer>
       <Title>{title}</Title>
+      <AuthorName>{author}</AuthorName>
       <Content>{content}</Content>
     </PostContainer>
   );
@@ -20,7 +22,6 @@ export default PostDetail;
 const PostContainer = styled.View`
   background-color: #ffffff;
   padding: 20px;
-  border-radius: 8px;
   shadow-color: #000;
   shadow-opacity: 0.1;
   shadow-radius: 4px;
@@ -33,6 +34,12 @@ const Title = styled.Text`
   font-weight: bold;
   color: #393b65;
   margin-bottom: 10px;
+`;
+
+const AuthorName = styled.Text`
+  font-size: 10px;
+  color: #7C7C7C;
+  margin-bottom: 5px;
 `;
 
 const Content = styled.Text`

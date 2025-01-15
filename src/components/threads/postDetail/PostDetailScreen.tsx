@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../../api/hooks/useAuth';
 import { db } from '../../../api/firebase';
 import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { useLocalSearchParams, Stack } from 'expo-router';
@@ -9,6 +10,7 @@ import CommentInputForm from './CommentInputForm';
 
 interface Comment {
   id: string;
+  author: string;
   content: string;
   createdAt: any;
 }
@@ -18,6 +20,7 @@ export default function PostDetailScreen() {
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
+  const user = useAuth();
 
   const fetchComments = async () => {
     const commentsRef = collection(db, 'comments');
@@ -44,15 +47,21 @@ export default function PostDetailScreen() {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    const commentsRef = collection(db, 'comments');
-    await addDoc(commentsRef, {
-      postId,
-      content: newComment,
-      createdAt: serverTimestamp(),
-    });
-    setNewComment('');
-    fetchComments();
-    console.log('New comment is added');
+    if (user) {
+      const commentsRef = collection(db, 'comments');
+      await addDoc(commentsRef, {
+        authorId: user.uid,
+        author: user.displayName,
+        postId,
+        content: newComment,
+        createdAt: serverTimestamp(),
+      });
+      setNewComment('');
+      fetchComments();
+      console.log('New comment is added');
+    } else {
+      console.log('User is not authenticated');
+    }
   };
 
   return (
@@ -64,9 +73,17 @@ export default function PostDetailScreen() {
         }}
       />
       <Container>
-        {post && <PostDetail title={post.title} content={post.content} />}
+        {post && <PostDetail 
+          title={post.title} 
+          author={post.author}
+          content={post.content} 
+        />}
         <CommentList comments={comments} />
-        <CommentInputForm value={newComment} onChangeText={setNewComment} onSubmit={handleAddComment} />
+        <CommentInputForm 
+          value={newComment} 
+          onChangeText={setNewComment} 
+          onSubmit={handleAddComment} 
+        />
       </Container>
     </>
   );
@@ -75,5 +92,5 @@ export default function PostDetailScreen() {
 const Container = styled.View`
   flex: 1;
   background-color: #f7f7f7;
-  padding: 20px;
+  padding: 0 0 20px 0;
 `;

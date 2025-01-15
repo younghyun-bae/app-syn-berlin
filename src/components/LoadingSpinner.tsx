@@ -19,5 +19,5 @@ const LoadingContainer = styled.View`
 const LoadingText = styled.Text`
     font-family: 'DMSans_700Bold';
     font-size: 18px;
-    color: #232323;
+    color: #7C7C7C;
 `;

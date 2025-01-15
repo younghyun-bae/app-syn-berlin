@@ -27,7 +27,7 @@ const PostScreen: React.FC<PostScreenProps> = ({ onClose }) => {
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
-      Alert.alert("It's empty", "Please enter what you want to share.");
+      Alert.alert("It's empty", "Please enter what you want to share");
       return;
     }
 

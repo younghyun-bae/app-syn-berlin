@@ -4,19 +4,20 @@ import { useRouter } from 'expo-router';
 
 interface PostButtonsProps {
   onSubmit: () => void;
+  onClose: () => void;
 }
 
-const PostButtons: React.FC<PostButtonsProps> = ({ onSubmit }) => {
+const PostButtons: React.FC<PostButtonsProps> = ({ onSubmit, onClose }) => {
   const router = useRouter();
 
   return (
     <ButtonContainer>
-      <CancelButton onPress={() => router.back()}>
-        <ButtonText>Cancel</ButtonText>
-      </CancelButton>
-      <PostButton onPress={onSubmit}>
-        <ButtonText>Post</ButtonText>
-      </PostButton>
+      <StyledButton onPress={onClose} backgroundColor="#d3d3d3">
+        <StyledButtonText>Cancel</StyledButtonText>
+      </StyledButton>
+      <StyledButton onPress={onSubmit} backgroundColor="#CDDC52">
+        <StyledButtonText>Create</StyledButtonText>
+      </StyledButton>
     </ButtonContainer>
   );
 };
@@ -29,20 +30,19 @@ const ButtonContainer = styled.View`
   width: 100%;
 `;
 
-const CancelButton = styled.TouchableOpacity`
-  background-color: #d3d3d3;
-  padding: 10px 20px;
-  border-radius: 50px;
+const StyledButton = styled.TouchableOpacity<{ backgroundColor: string }>`
+  flex: 1;
+  background-color: ${({ backgroundColor }) => backgroundColor};
+  border-radius: 30px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 17px;
+  margin: 0 12px;
 `;
 
-const PostButton = styled.TouchableOpacity`
-  background-color: #9082C3;
-  padding: 10px 20px;
-  border-radius: 50px;
-`;
-
-const ButtonText = styled.Text`
-  color: #ffffff;
+const StyledButtonText = styled.Text`
+  font-family: 'DMSans_500Medium';
+  color: #232323;
   font-size: 16px;
   font-weight: bold;
   text-align: center;

@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, ActivityIndicator, RefreshControl, View, Text } from 'react-native';
+import { FlatList, RefreshControl, View, Text, Modal } from 'react-native';
 import { db } from '../../api/firebase';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { useRouter, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import PostItem from './PostItem';
 import CreateBtn from './CreateBtn';
 import LoadingSpinner from '../LoadingSpinner';
+import PostScreen from './post/PostScreen';
 
 interface Post {
   id: string;
@@ -29,7 +30,7 @@ const ThreadScreen: React.FC<ThreadScreenProps> = ({ initialNumToRender = 100 })
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -92,6 +93,11 @@ const ThreadScreen: React.FC<ThreadScreenProps> = ({ initialNumToRender = 100 })
     // This is a placeholder for infinite scroll logic
   };
 
+  const handleModalClose = () => {
+    setModalVisible(false);
+    fetchPosts();
+  };
+
   return (
     <>
       <Stack.Screen options={{ headerTitle: 'Threads', headerBackTitleVisible: false }} />
@@ -127,7 +133,17 @@ const ThreadScreen: React.FC<ThreadScreenProps> = ({ initialNumToRender = 100 })
           testID="post-list"
         />
       )}
-      <CreateBtn testID="create-btn" />
+      <CreateBtn onPress={() => setModalVisible(true)} testID="create-btn" />
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <PostScreen onClose={handleModalClose} />
+        </View>
+      </Modal>
     </>
   );
 }
