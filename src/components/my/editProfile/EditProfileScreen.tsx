@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ScrollView } from 'react-native';
-import { User } from 'firebase/auth';
-import { onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../api/firebase';
+
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from 'src/api/firebase';
+import { useProfile } from 'src/api/context/ProfileContext';
+import { useAuth } from 'src/api/context/AuthContext';
+
 import { useRouter } from 'expo-router';
-import styled from 'styled-components/native';
 
 import FormItem from './FormItem';
 import InterestSelector from './InterestSelector';
@@ -12,48 +14,30 @@ import ProfileImgUpload from './ProfileImgUpload';
 import SocialMediaInput from './SocialMediaInput';
 import ButtonGroup from './ButtonGroup';
 
-interface EditProfileScreenProps {
-  user: User | null;
-}
+import styled from 'styled-components/native';
 
-const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ user }) => {
+const EditProfileScreen: React.FC = () => {
+  const { state, dispatch } = useProfile();
+  const { state: authState } = useAuth();
+  const { profile } = state;
+  const { user } = authState;
   const router = useRouter();
 
-  const [displayName, setDisplayName] = useState('');
-  const [location, setLocation] = useState('');
-  const [jobTitle, setJobTitle] = useState('');
-  const [mainField, setMainField] = useState('');
-  const [aboutMe, setAboutMe] = useState('');
-  const [interests, setInterests] = useState<string[]>([]);
-  const [proudWork, setProudWork] = useState('');
-  const [portfolio, setPortfolio] = useState('');
-  const [languages, setLanguages] = useState('');
-
-  useEffect(() => {
-    if (user) {
-      const userRef = doc(db, 'users', user.uid);
-      const unsubscribe = onSnapshot(userRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setDisplayName(data.displayName || '');
-          setLocation(data.location || '');
-          setJobTitle(data.jobTitle || '');
-          setMainField(data.mainField || '');
-          setAboutMe(data.aboutMe || '');
-          setInterests(data.interests || []);
-          setProudWork(data.proudWork || '');
-          setPortfolio(data.portfolio || '');
-          setLanguages(data.languages || '');
-        }
-      });
-      return unsubscribe;
-    }
-  }, [user]);
+  const [displayName, setDisplayName] = useState(profile?.displayName || '');
+  const [location, setLocation] = useState(profile?.location || '');
+  const [jobTitle, setJobTitle] = useState(profile?.jobTitle || '');
+  const [mainField, setMainField] = useState(profile?.mainField || '');
+  const [aboutMe, setAboutMe] = useState(profile?.aboutMe || '');
+  const [interests, setInterests] = useState<string[]>(profile?.interests || []);
+  const [proudWork, setProudWork] = useState(profile?.proudWork || '');
+  const [portfolio, setPortfolio] = useState(profile?.portfolio || '');
+  const [languages, setLanguages] = useState(profile?.languages || '');
 
   const handleSave = async () => {
     if (user) {
       try {
-        await updateDoc(doc(db, 'users', user.uid), {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
           displayName,
           location,
           jobTitle,
@@ -64,23 +48,35 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ user }) => {
           portfolio,
           languages,
         });
-        router.push('/tab_4/myProfile');
+        dispatch({
+          type: 'UPDATE_PROFILE',
+          payload: {
+            displayName,
+            location,
+            jobTitle,
+            mainField,
+            aboutMe,
+            interests,
+            proudWork,
+            portfolio,
+            languages,
+          },
+        });
+        console.log('Profile edited successfully');
+        router.push('/tab_4');
       } catch (error) {
-        console.error('Error updating profile:', error);
+        console.error('EditProfileScreen: Error updating profile:', error);
       }
+    } else {
+      console.log('EditProfileScreen: User is not authenticated');
+      
     }
   };
 
-  // const toggleInterest = (interest: string) => {
-  //   setInterests((prevInterests) => {
-  //     if (prevInterests.includes(interest)) {
-  //       return prevInterests.filter((i) => i !== interest);
-  //     } else if (prevInterests.length < 4) {
-  //       return [...prevInterests, interest];
-  //     }
-  //     return prevInterests;
-  //   });
-  // };
+  const handleCancel = () => {
+    console.log('Cancel button clicked');
+    router.back();
+  };
 
   return (
     <Container>
@@ -127,7 +123,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ user }) => {
           onChangeText={setLanguages}
         />
 
-        <ButtonGroup onSave={handleSave} onCancel={() => router.back()} />
+        <ButtonGroup onSave={handleSave} onCancel={handleCancel} />
       </ScrollView>
     </Container>
   );

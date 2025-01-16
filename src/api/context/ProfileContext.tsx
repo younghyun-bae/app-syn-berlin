@@ -4,19 +4,37 @@ import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 
 interface ProfileState {
-  profile: any | null;
+  profile: Profile | null;
+}
+
+interface Profile {
+  photoURL?: string;
+  email?: string;
+  displayName?: string;
+  location?: string;
+  jobTitle?: string;
+  mainField?: string;
+  aboutMe?: string;
+  interests?: string[];
+  proudWork?: string;
+  portfolio?: string;
+  languages?: string;
 }
 
 const initialState: ProfileState = {
   profile: null,
 };
 
-type Action = { type: 'SET_PROFILE'; payload: any | null };
+type Action = 
+  | { type: 'SET_PROFILE'; payload: Profile | null }
+  | { type: 'UPDATE_PROFILE'; payload: Partial<Profile> };
 
 const profileReducer = (state: ProfileState, action: Action): ProfileState => {
   switch (action.type) {
     case 'SET_PROFILE':
       return { ...state, profile: action.payload };
+    case 'UPDATE_PROFILE':
+      return { ...state, profile: { ...state.profile, ...action.payload } };
     default:
       return state;
   }
@@ -36,7 +54,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
       const userRef = doc(db, 'users', authState.user.uid);
       const unsubscribe = onSnapshot(userRef, (docSnap) => {
         if (docSnap.exists()) {
-          dispatch({ type: 'SET_PROFILE', payload: docSnap.data() });
+          dispatch({ type: 'SET_PROFILE', payload: docSnap.data() as Profile });
         }
       });
 

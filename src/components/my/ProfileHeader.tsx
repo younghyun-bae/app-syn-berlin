@@ -3,24 +3,25 @@ import styled from 'styled-components/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 
+interface Profile {
+    displayName?: string;
+    location?: string;
+    jobTitle?: string;
+    mainField?: string;
+    photoURL?: string;
+    email?: string;
+}
 interface ProfileHeaderProps {
-    profile: {
-        displayName: string;
-        location: string;
-        jobTitle: string;
-        mainField: string;
-    };
-    photoURL: string | null | undefined;
-    email: string | null | undefined;
+    profile: Profile;
 }
 
-const ProfileHeader = ({ profile, photoURL, email }: ProfileHeaderProps) => (
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => (
     <HeaderContainer>
         <ImageContainer>
-            <ProfileImage source={{ uri: photoURL || require('../../../assets/images/default-profile-image.png') }} />
+            <ProfileImage source={{ uri: profile.photoURL || require('../../../assets/images/default-profile-image.png') }} />
         </ImageContainer>
         <InfoContainer>
-            <ProfileName>{profile.displayName || email}</ProfileName>
+            <ProfileName>{profile.displayName || profile.email}</ProfileName>
             <Location>
                 <FontAwesomeIcon icon={faLocationDot} size={16} color="#5A5A5F" />
                 {' '}
