@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../api/hooks/useAuth';
+import { useAuth } from 'src/api/context/AuthContext';
+import { useProfile } from 'src/api/context/ProfileContext';
 import { db } from '../../../api/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter, Stack } from 'expo-router';
@@ -19,11 +20,16 @@ const PostScreen: React.FC<PostScreenProps> = ({ onClose }) => {
   const [content, setContent] = useState<string>('');
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isContentFocused, setIsContentFocused] = useState(false);
-  const router = useRouter();
-  const user = useAuth();
-  const maxContentLength = 2000;
 
-  // console.log(user);
+  const router = useRouter();
+
+  const { state: authState } = useAuth();
+  const { user } = authState;
+
+  const { state } = useProfile();
+  const { profile } = state;
+
+  const maxContentLength = 2000;
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
@@ -31,16 +37,18 @@ const PostScreen: React.FC<PostScreenProps> = ({ onClose }) => {
       return;
     }
 
-    if (user) {
+    if (user && profile) {
       try {
         const postsRef = collection(db, 'posts');
         await addDoc(postsRef, {
           authorId: user.uid,
           author: user.displayName,
+          jobTitle: profile.jobTitle,
           title,
           content,
-          likes: 0,
           createdAt: serverTimestamp(),
+          likes: 0,
+          replies: 0,
         });
         setTitle('');
         setContent('');

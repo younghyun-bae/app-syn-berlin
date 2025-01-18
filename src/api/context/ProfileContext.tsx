@@ -55,7 +55,11 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
       const unsubscribe = onSnapshot(userRef, (docSnap) => {
         if (docSnap.exists()) {
           dispatch({ type: 'SET_PROFILE', payload: docSnap.data() as Profile });
+        } else {
+          console.warn("No profile found for user:", authState.user?.uid);
         }
+      }, (error) => {
+        console.error("Error fetching profile:", error);
       });
 
       return () => unsubscribe();

@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext, useEffect, ReactNode } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../firebase'; // Firebase 설정 파일에서 auth를 가져옵니다.
+import { auth } from '../firebase';
 
 interface AuthState {
   user: User | null;
@@ -33,7 +33,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log("User state changed:", user);
       dispatch({ type: 'SET_USER', payload: user });
-    });
+    }, (error) => {
+      console.error("Error in onAuthStateChanged:", error);
+    } 
+  );
 
     return () => unsubscribe();
   }, []);

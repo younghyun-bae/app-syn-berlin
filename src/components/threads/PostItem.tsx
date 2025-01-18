@@ -1,20 +1,13 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import styled from 'styled-components/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+
 import { useRouter } from 'expo-router';
 
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  likes: number;
-  author: string;
-  createdAt: Date;
-  replies: number;
-  likedByUser?: boolean;
-}
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faHeart, faCommentDots } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components/native';
+
+import { Post } from '../../types/postTypes';
 
 interface PostItemProps {
   post: Post;
@@ -30,7 +23,9 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
   return (
     <PostContainer style={index === 0 ? { marginTop: 20 } : {}} testID={testID}>
       <PostHeader>
-        <Title numberOfLines={1}>{post.title}</Title>
+        <TouchableOpacity onPress={() => router.push(`/detail/postDetail?postId=${post.id}`)} style={{ flex: 1 }}>
+          <Title numberOfLines={1}>{post.title}</Title>
+        </TouchableOpacity>
         <Likes onPress={() => onLike(post.id, post.likes, post.likedByUser || false)} testID={`like-button-${index}`}>
           <FontAwesomeIcon
             icon={faHeart}
@@ -40,11 +35,20 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
         </Likes>
       </PostHeader>
       <TouchableOpacity onPress={() => router.push(`/detail/postDetail?postId=${post.id}`)}>
-        <AuthorName>{post.author}</AuthorName>
+        <AuthorName>
+          {post.author} {post.jobTitle ? `(${post.jobTitle})` : ''}
+        </AuthorName>
         <Content numberOfLines={2}>{post.content}</Content>
       </TouchableOpacity>
       <PostFooter>
-        <Replies>{post.replies} replies</Replies>
+        <Replies>
+          <NumReplies>{post.replies}&nbsp;&nbsp;</NumReplies>
+          <FontAwesomeIcon
+              icon={faCommentDots}
+              color={'#C6C6C6'}
+            />
+        </Replies>
+
         <CreatedAt>{formatDate(post.createdAt)}</CreatedAt>
       </PostFooter>
     </PostContainer>
@@ -85,7 +89,6 @@ const Title = styled.Text`
   font-size: 14px;
   color: #393B65;
   font-weight: bold;
-  flex: 1;
   margin-right: 10px;
   overflow: hidden;
 `;
@@ -110,7 +113,12 @@ const PostFooter = styled.View`
   margin-top: 10px;
 `;
 
-const Replies = styled.Text`
+const Replies = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const NumReplies = styled.Text`
   font-size: 12px;
   color: #7D7D7D;
 `;

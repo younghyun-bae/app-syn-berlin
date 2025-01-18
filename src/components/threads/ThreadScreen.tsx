@@ -8,16 +8,7 @@ import CreateBtn from './CreateBtn';
 import LoadingSpinner from '../LoadingSpinner';
 import PostScreen from './post/PostScreen';
 
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  likes: number;
-  author: string;
-  createdAt: any;
-  replies: number;
-  likedByUser?: boolean;
-}
+import { Post } from 'src/types/postTypes';
 
 export interface ThreadScreenProps {
   initialNumToRender?: number;
