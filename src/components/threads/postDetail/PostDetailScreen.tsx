@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
-
 import { db } from 'src/api/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { Alert, Text, Button, View } from 'react-native';
 
-import { usePostComment } from 'src/api/context/ThreadContext';
+// import { usePostComment } from 'src/api/context/ThreadContext';
+
 import { useAuth } from 'src/api/context/AuthContext';
 import { useProfile } from 'src/api/context/ProfileContext';
+import { usePosts } from 'src/api/context/PostContext';
 
 import { useLocalSearchParams, Stack } from 'expo-router';
 import styled from 'styled-components/native';
@@ -15,19 +16,18 @@ import CommentList from './CommentList';
 import CommentInputForm from './CommentInputForm';
 
 export default function PostDetailScreen() {
-  const { postId } = useLocalSearchParams();
-  const { state, fetchComments } = usePostComment();
-  const [newComment, setNewComment] = useState('');
-
   const { state: authState } = useAuth();
   const { user } = authState;
-  const { state: profileState } = useProfile();
+  const { posts, deletePost, updatePost } = usePosts();
+  const { profile } = useProfile().state;
 
-  useEffect(() => {
-    fetchComments(postId as string);
-  }, [postId]);
+  const { postId } = useLocalSearchParams();
+  const post = posts.find((p) => p.id === postId);
+  const [newComment, setNewComment] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(post?.content || '');
 
-  const post = state.posts.find(p => p.id === postId);
+  if (!post) return <Text>No post found</Text>;
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
@@ -35,45 +35,78 @@ export default function PostDetailScreen() {
       return;
     }
 
-    if (!user) {
-      console.log('User is not authenticated');
-      return;
+    if (user && profile) {
+      try {
+        console.log('Adding comment for user:', user.uid);
+        console.log('With profile:', profile);
+        const commentsRef = collection(db, 'comments');
+        await addDoc(commentsRef, {
+          authorId: user.uid,
+          author: user.displayName || 'Unknown',
+          jobTitle: profile.jobTitle || 'Undefined',
+          postId,
+          content: newComment,
+          createdAt: serverTimestamp(),
+        });
+  
+        setNewComment('');
+        fetchComments(postId as string);
+        console.log('New comment is added');
+      } catch (error) {
+        console.error("Error adding comment:", error);
+      }
     }
+  };
 
-    if (!profileState.profile) {
-      console.log('Profile is not loaded');
+
+  const handleEditPost = async () => {
+    if (!editedContent.trim()) {
+      Alert.alert("It's empty", 'Please enter valid content.');
       return;
     }
 
     try {
-      console.log('Adding comment for user:', user.uid);
-      console.log('With profile:', profileState.profile);
-
-      const commentsRef = collection(db, 'comments');
-      await addDoc(commentsRef, {
-        authorId: user.uid,
-        author: user.displayName || 'Unknown',
-        jobTitle: profileState.profile.jobTitle || 'Undefined',
-        postId,
-        content: newComment,
-        createdAt: serverTimestamp(),
-      });
-
-      setNewComment('');
-      fetchComments(postId as string);
-      console.log('New comment is added');
+      await updatePost(post.id, { content: editedContent });
+      setIsEditing(false);
+      Alert.alert('Success', 'Post updated successfully.');
     } catch (error) {
-      console.error("Error adding comment:", error);
+      console.error('Error editing post:', error);
+      Alert.alert('Error', 'Failed to edit the post.');
     }
   };
 
-  const handleEditComment = (commentId: string) => {
+  const handleDeletePost = async () => {
+    Alert.alert('Confirm', 'Are you sure you want to delete this post?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deletePost(post.id);
+            Alert.alert('Success', 'Post deleted successfully.');
+          } catch (error) {
+            console.error('Error deleting post:', error);
+            Alert.alert('Error', 'Failed to delete the post.');
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleEditComment = async (commentId: string) => {
     console.log(`Edit comment with ID: ${commentId}`);
   };
 
   const handleDeleteComment = async (commentId: string) => {
     console.log(`Delete comment with ID: ${commentId}`);
+
   };
+
+  const isAuthor = user?.uid === post.authorId;
 
   return (
     <>
@@ -84,14 +117,28 @@ export default function PostDetailScreen() {
         }}
       />
       <Container>
-        {post && <PostDetail 
-          title={post.title} 
-          author={post.author}
-          jobTitle={post.jobTitle}
-          content={post.content}
-          createdAt={post.createdAt} 
-        />}
-        <CommentList comments={state.comments} />
+        {post ? (
+            <PostDetail 
+              title={post.title} 
+              author={post.author}
+              jobTitle={post.jobTitle}
+              isAuthor={isAuthor}
+              content={isEditing ? editedContent : post.content}
+              createdAt={post.createdAt}
+              isEditing={isAuthor ? isEditing : false}
+              onEdit={() => isAuthor && setIsEditing(true)}
+              onSave={handleEditPost}
+              onCancel={() => {
+                setIsEditing(false);
+                setEditedContent(post.content);
+              }}
+              onDelete={isAuthor ? handleDeletePost : undefined} 
+              onContentChange={setEditedContent}
+            />
+          ) : (
+            <Text>No post found</Text>
+          )}
+        <CommentList comments={post.comments || []} />
         <CommentInputForm 
           value={newComment} 
           onChangeText={setNewComment} 
