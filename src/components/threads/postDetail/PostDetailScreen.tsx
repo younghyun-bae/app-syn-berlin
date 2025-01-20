@@ -1,67 +1,78 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../../api/hooks/useAuth';
-import { db } from '../../../api/firebase';
-import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { Alert } from 'react-native';
+
+import { db } from 'src/api/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+import { usePostComment } from 'src/api/context/ThreadContext';
+import { useAuth } from 'src/api/context/AuthContext';
+import { useProfile } from 'src/api/context/ProfileContext';
+
 import { useLocalSearchParams, Stack } from 'expo-router';
 import styled from 'styled-components/native';
 import PostDetail from './PostDetail';
 import CommentList from './CommentList';
 import CommentInputForm from './CommentInputForm';
 
-interface Comment {
-  id: string;
-  author: string;
-  content: string;
-  createdAt: any;
-}
-
 export default function PostDetailScreen() {
   const { postId } = useLocalSearchParams();
-  const [post, setPost] = useState<any>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const { state, fetchComments } = usePostComment();
   const [newComment, setNewComment] = useState('');
-  const user = useAuth();
 
-  const fetchComments = async () => {
-    const commentsRef = collection(db, 'comments');
-    const q = query(commentsRef, where('postId', '==', postId));
-    const commentSnapshot = await getDocs(q);
-    const commentList = commentSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Comment[];
-    setComments(commentList);
-  };
+  const { state: authState } = useAuth();
+  const { user } = authState;
+  const { state: profileState } = useProfile();
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const postDoc = doc(db, 'posts', postId as string);
-      const postSnapshot = await getDoc(postDoc);
-      setPost(postSnapshot.data());
-    };
-
-    fetchPost();
-    fetchComments();
+    fetchComments(postId as string);
   }, [postId]);
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
+  const post = state.posts.find(p => p.id === postId);
 
-    if (user) {
+  const handleAddComment = async () => {
+    if (!newComment.trim()) {
+      Alert.alert("It's empty", "Please enter your response.");
+      return;
+    }
+
+    if (!user) {
+      console.log('User is not authenticated');
+      return;
+    }
+
+    if (!profileState.profile) {
+      console.log('Profile is not loaded');
+      return;
+    }
+
+    try {
+      console.log('Adding comment for user:', user.uid);
+      console.log('With profile:', profileState.profile);
+
       const commentsRef = collection(db, 'comments');
       await addDoc(commentsRef, {
         authorId: user.uid,
-        author: user.displayName,
+        author: user.displayName || 'Unknown',
+        jobTitle: profileState.profile.jobTitle || 'Undefined',
         postId,
         content: newComment,
         createdAt: serverTimestamp(),
       });
+
       setNewComment('');
-      fetchComments();
+      fetchComments(postId as string);
       console.log('New comment is added');
-    } else {
-      console.log('User is not authenticated');
+    } catch (error) {
+      console.error("Error adding comment:", error);
     }
+  };
+
+  const handleEditComment = (commentId: string) => {
+    console.log(`Edit comment with ID: ${commentId}`);
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    console.log(`Delete comment with ID: ${commentId}`);
   };
 
   return (
@@ -76,9 +87,11 @@ export default function PostDetailScreen() {
         {post && <PostDetail 
           title={post.title} 
           author={post.author}
-          content={post.content} 
+          jobTitle={post.jobTitle}
+          content={post.content}
+          createdAt={post.createdAt} 
         />}
-        <CommentList comments={comments} />
+        <CommentList comments={state.comments} />
         <CommentInputForm 
           value={newComment} 
           onChangeText={setNewComment} 

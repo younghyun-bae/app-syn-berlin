@@ -1,12 +1,7 @@
 import React from 'react';
 import { FlatList } from 'react-native';
 import CommentItem from './CommentItem';
-
-interface Comment {
-  id: string;
-  author: string;
-  content: string;
-}
+import { Comment } from '../../../types/commentTypes';
 
 interface CommentListProps {
   comments: Comment[];
@@ -16,10 +11,18 @@ const CommentList: React.FC<CommentListProps> = ({ comments }) => {
   return (
     <FlatList
       data={comments}
-      renderItem={({ item }) => <CommentItem 
-      author={item.author}
-      content={item.content}
-      />}
+      renderItem={({ item }) => (
+        <CommentItem
+          id={item.id}
+          author={item.author}
+          content={item.content}
+          createdAt={item.createdAt}
+          isAuthor={item.isAuthor}
+          jobTitle={item.jobTitle}
+          onEdit={() => item.onEdit()}
+          onDelete={() => item.onDelete()}
+        />
+      )}
       keyExtractor={(item) => item.id}
     />
   );

@@ -1,16 +1,28 @@
 import React from 'react';
 import styled from 'styled-components/native';
 
-interface CommentItemProps {
-  content: string;
-  author: string;
-}
+import { Comment } from '../../../types/commentTypes';
 
-const CommentItem: React.FC<CommentItemProps> = ({ content, author }) => {
+const CommentItem: React.FC<Comment> = ({ content, author, jobTitle, createdAt, isAuthor, onEdit, onDelete }) => {
+  const formattedDate = createdAt instanceof Date ? createdAt.toLocaleDateString() : 'Invalid Date';
+
   return (
     <CommentContainer>
-      <AuthorName>{author}</AuthorName>
+      <CommentHeader>
+        <AuthorName>
+          {author} {jobTitle ? `(${jobTitle})` : ''}
+        </AuthorName>
+        <CommentDate>
+        {formattedDate}
+      </CommentDate>
+      </CommentHeader>
       <CommentText>{content}</CommentText>
+      {isAuthor && (
+        <ActionButtons>
+          <ActionButton onPress={onEdit}>Edit</ActionButton>
+          <ActionButton onPress={onDelete}>Delete</ActionButton>
+        </ActionButtons>
+      )}
     </CommentContainer>
   );
 };
@@ -27,6 +39,11 @@ const CommentContainer = styled.View`
   margin-bottom: 10px;
 `;
 
+const CommentHeader = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
 const AuthorName = styled.Text`
   font-size: 10px;
   color: #7C7C7C;
@@ -36,4 +53,21 @@ const AuthorName = styled.Text`
 const CommentText = styled.Text`
   font-size: 14px;
   color: #393b65;
+`;
+
+const CommentDate = styled.Text`
+  font-size: 10px;
+  color: #A8A8A8;
+`;
+
+const ActionButtons = styled.View`
+  flex-direction: row;
+  margin-top: 5px;
+`;
+
+const ActionButton = styled.Text`
+  font-size: 12px;
+  color: #007BFF;
+  margin-right: 15px;
+  cursor: pointer;
 `;
