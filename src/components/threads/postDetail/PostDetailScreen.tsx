@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { db } from 'src/api/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { Alert, Text, Button, View } from 'react-native';
-
-// import { usePostComment } from 'src/api/context/ThreadContext';
+import { Alert, Text } from 'react-native';
 
 import { useAuth } from 'src/api/context/AuthContext';
 import { useProfile } from 'src/api/context/ProfileContext';
@@ -18,7 +16,7 @@ import CommentInputForm from './CommentInputForm';
 export default function PostDetailScreen() {
   const { state: authState } = useAuth();
   const { user } = authState;
-  const { posts, deletePost, updatePost } = usePosts();
+  const { posts, deletePost, updatePost, fetchPostById } = usePosts();
   const { profile } = useProfile().state;
 
   const { postId } = useLocalSearchParams();
@@ -27,12 +25,22 @@ export default function PostDetailScreen() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post?.content || '');
 
+  useEffect(() => {
+    if (postId) {
+      fetchPostById(postId as string);
+    }
+  }, [postId, fetchPostById]);
+
   if (!post) return <Text>No post found</Text>;
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
       Alert.alert("It's empty", "Please enter your response.");
       return;
+    }
+
+    if (!user) {
+      throw new Error('User must be logged in to leave a comment');
     }
 
     if (user && profile) {
@@ -47,10 +55,11 @@ export default function PostDetailScreen() {
           postId,
           content: newComment,
           createdAt: serverTimestamp(),
+          // likes: 0,
         });
   
         setNewComment('');
-        fetchComments(postId as string);
+        await fetchPostById(postId as string);
         console.log('New comment is added');
       } catch (error) {
         console.error("Error adding comment:", error);

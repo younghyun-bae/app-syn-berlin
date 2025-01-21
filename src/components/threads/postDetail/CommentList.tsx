@@ -1,10 +1,9 @@
 import React from 'react';
 import { FlatList } from 'react-native';
 import CommentItem from './CommentItem';
-import { Comment } from '../../../types/commentTypes';
-
+import { Comment } from 'src/api/context/PostContext';
 interface CommentListProps {
-  comments: Comment[];
+  comments: Comment[]
 }
 
 const CommentList: React.FC<CommentListProps> = ({ comments }) => {

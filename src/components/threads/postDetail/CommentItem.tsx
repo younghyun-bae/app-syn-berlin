@@ -1,9 +1,18 @@
 import React from 'react';
 import styled from 'styled-components/native';
 
-import { Comment } from '../../../types/commentTypes';
+interface CommentProps {
+  id: string;
+  content: string;
+  author: string;
+  createdAt: Date;
+  jobTitle?: string;
+  isAuthor: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}
 
-const CommentItem: React.FC<Comment> = ({ content, author, jobTitle, createdAt, isAuthor, onEdit, onDelete }) => {
+const CommentItem: React.FC<CommentProps> = ({ content, author, jobTitle, createdAt, isAuthor, onEdit, onDelete }) => {
   const formattedDate = createdAt instanceof Date ? createdAt.toLocaleDateString() : 'Invalid Date';
 
   return (

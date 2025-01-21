@@ -1,6 +1,19 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
 import { db } from '../firebase';
-import { collection, doc, getDoc, getDocs, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc, deleteDoc, query, where, Timestamp } from 'firebase/firestore';
+
+export interface Comment {
+  id: string;
+  content: string;
+  author: string;
+  jobTitle?: string;
+  authorId: string;
+  createdAt: Date;
+  likes: number;
+  isAuthor: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}
 
 export interface Post {
   id: string;
@@ -9,13 +22,58 @@ export interface Post {
   author: string;
   authorId: string;
   jobTitle?: string;
-  createdAt: any;
+  createdAt: Date;
   likes: number;
   replies: number;
+  comments: Comment[];
   isAuthor: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }
+
+interface State {
+  posts: Post[];
+  loading: boolean;
+  error: string | null;
+}
+
+type Action =
+  | { type: 'FETCH_START' }
+  | { type: 'FETCH_SUCCESS'; payload: Post[] }
+  | { type: 'FETCH_ERROR'; payload: string }
+  | { type: 'UPDATE_POST'; payload: { id: string; updatedData: Partial<Post> } }
+  | { type: 'DELETE_POST'; payload: string };
+
+const initialState: State = {
+  posts: [],
+  loading: true,
+  error: null,
+};
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'FETCH_START':
+      return { ...state, loading: true, error: null };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, posts: action.payload };
+    case 'FETCH_ERROR':
+      return { ...state, loading: false, error: action.payload };
+    case 'UPDATE_POST':
+      return {
+        ...state,
+        posts: state.posts.map((post) =>
+          post.id === action.payload.id ? { ...post, ...action.payload.updatedData } : post
+        ),
+      };
+    case 'DELETE_POST':
+      return {
+        ...state,
+        posts: state.posts.filter((post) => post.id !== action.payload),
+      };
+    default:
+      return state;
+  }
+};
 
 interface PostContextProps {
   posts: Post[];
@@ -30,13 +88,32 @@ interface PostContextProps {
 const PostContext = createContext<PostContextProps | undefined>(undefined);
 
 export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const fetchCommentsForPost = async (postId: string): Promise<Comment[]> => {
+    const commentsCollection = collection(db, 'comments');
+    const commentQuery = query(commentsCollection, where('postId', '==', postId));
+    const commentSnapshot = await getDocs(commentQuery);
+
+    return commentSnapshot.docs.map(commentDoc => {
+      const commentData = commentDoc.data();
+      return {
+        id: commentDoc.id,
+        content: commentData.content || '',
+        author: commentData.author || '',
+        authorId: commentData.authorId || '',
+        jobTitle: commentData.jobTitle || '',
+        createdAt: commentData.createdAt ? new Date(commentData.createdAt.seconds * 1000) : new Date(),
+        likes: commentData.likes || 0,
+        isAuthor: false,
+        onEdit: () => {},
+        onDelete: () => {},
+      } as Comment;
+    }).sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  };
 
   const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    dispatch({ type: 'FETCH_START' });
     try {
       const postsCollection = collection(db, 'posts');
       const postSnapshot = await getDocs(postsCollection);
@@ -48,26 +125,22 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...doc.data(),
           } as Post;
 
-          const commentsCollection = collection(db, 'comments');
-          const commentQuery = query(commentsCollection, where('postId', '==', doc.id));
-          const commentSnapshot = await getDocs(commentQuery);
+          postData.comments = await fetchCommentsForPost(doc.id);
+          postData.replies = postData.comments.length;
 
-          postData.replies = commentSnapshot.size;
-          if (postData.createdAt?.seconds) {
-            postData.createdAt = new Date(postData.createdAt.seconds * 1000);
+          if (postData.createdAt instanceof Timestamp) {
+            postData.createdAt = postData.createdAt.toDate();
           }
 
           return postData;
         })
       );
 
-      postList.sort((a, b) => b.createdAt - a.createdAt);
-      setPosts(postList);
+      postList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      dispatch({ type: 'FETCH_SUCCESS', payload: postList });
     } catch (err) {
-      setError('Error fetching posts');
+      dispatch({ type: 'FETCH_ERROR', payload: 'Error fetching posts' });
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -85,13 +158,11 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...postDoc.data(),
       } as Post;
 
-      const commentsCollection = collection(db, 'comments');
-      const commentQuery = query(commentsCollection, where('postId', '==', id));
-      const commentSnapshot = await getDocs(commentQuery);
+      postData.comments = await fetchCommentsForPost(id);
+      postData.replies = postData.comments.length;
 
-      postData.replies = commentSnapshot.size;
-      if (postData.createdAt?.seconds) {
-        postData.createdAt = new Date(postData.createdAt.seconds * 1000);
+      if (postData.createdAt instanceof Timestamp) {
+        postData.createdAt = postData.createdAt.toDate();
       }
 
       return postData;
@@ -106,9 +177,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const postRef = doc(db, 'posts', id);
       await updateDoc(postRef, updatedData);
 
-      setPosts((prevPosts) =>
-        prevPosts.map((post) => (post.id === id ? { ...post, ...updatedData } : post))
-      );
+      dispatch({ type: 'UPDATE_POST', payload: { id, updatedData } });
     } catch (err) {
       console.error('Error updating post:', err);
       throw new Error('Failed to update post');
@@ -120,7 +189,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const postRef = doc(db, 'posts', id);
       await deleteDoc(postRef);
 
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+      dispatch({ type: 'DELETE_POST', payload: id });
     } catch (err) {
       console.error('Error deleting post:', err);
       throw new Error('Failed to delete post');
@@ -132,7 +201,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [fetchPosts]);
 
   return (
-    <PostContext.Provider value={{ posts, loading, error, fetchPosts, fetchPostById, updatePost, deletePost }}>
+    <PostContext.Provider value={{ ...state, fetchPosts, fetchPostById, updatePost, deletePost }}>
       {children}
     </PostContext.Provider>
   );
