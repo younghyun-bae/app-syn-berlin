@@ -6,18 +6,21 @@ import { Alert, Text } from 'react-native';
 import { useAuth } from 'src/api/context/AuthContext';
 import { useProfile } from 'src/api/context/ProfileContext';
 import { usePosts } from 'src/api/context/PostContext';
+import { useComments } from 'src/api/context/CommentContext';
 
 import { useLocalSearchParams, Stack } from 'expo-router';
 import styled from 'styled-components/native';
 import PostDetail from './PostDetail';
 import CommentList from './CommentList';
 import CommentInputForm from './CommentInputForm';
+import LoadingSpinner from 'src/components/LoadingSpinner';
 
 export default function PostDetailScreen() {
   const { state: authState } = useAuth();
   const { user } = authState;
   const { posts, deletePost, updatePost, fetchPostById } = usePosts();
   const { profile } = useProfile().state;
+  const { state: commentState, loadComments, addComment, deleteComment, updateComment } = useComments();
 
   const { postId } = useLocalSearchParams();
   const post = posts.find((p) => p.id === postId);
@@ -25,24 +28,36 @@ export default function PostDetailScreen() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post?.content || '');
 
+
+  // useEffect(() => {
+  //   if (postId) {
+  //     console.log('Loading comments for postId:', postId);
+  //     loadComments(postId as string).catch((error) => {
+  //       console.error('Error loading comments:', error);
+  //     });
+  //   }
+  // }, [postId, loadComments]);
+
+  // console.log('Comment State:', commentState);
+
   useEffect(() => {
     if (postId) {
       fetchPostById(postId as string);
     }
   }, [postId, fetchPostById]);
 
-  if (!post) return <Text>No post found</Text>;
+  if (!post) return <LoadingSpinner />;
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
       Alert.alert("It's empty", "Please enter your response.");
       return;
     }
-
+  
     if (!user) {
       throw new Error('User must be logged in to leave a comment');
     }
-
+  
     if (user && profile) {
       try {
         console.log('Adding comment for user:', user.uid);
@@ -55,25 +70,25 @@ export default function PostDetailScreen() {
           postId,
           content: newComment,
           createdAt: serverTimestamp(),
-          // likes: 0,
+          likes: 0,
         });
   
         setNewComment('');
+        console.log('New comment is added and state updated');
         await fetchPostById(postId as string);
-        console.log('New comment is added');
       } catch (error) {
         console.error("Error adding comment:", error);
       }
     }
   };
-
+  
 
   const handleEditPost = async () => {
     if (!editedContent.trim()) {
       Alert.alert("It's empty", 'Please enter valid content.');
       return;
     }
-
+  
     try {
       await updatePost(post.id, { content: editedContent });
       setIsEditing(false);
@@ -106,13 +121,47 @@ export default function PostDetailScreen() {
     ]);
   };
 
-  const handleEditComment = async (commentId: string) => {
-    console.log(`Edit comment with ID: ${commentId}`);
+  const handleEditComment = async (commentId: string, updatedContent: string) => {
+    if (!updatedContent.trim()) {
+      Alert.alert("Error", "Content cannot be empty.");
+      return;
+    }
+  
+    try {
+      await updateComment(commentId, updatedContent);
+      Alert.alert("Success", "Comment updated successfully.");
+      // await loadComments(postId as string);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      Alert.alert("Error", "Failed to update the comment.");
+    }
   };
-
+  
   const handleDeleteComment = async (commentId: string) => {
-    console.log(`Delete comment with ID: ${commentId}`);
-
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to delete this comment?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteComment(commentId);
+              Alert.alert("Success", "Comment deleted successfully.");
+              // await loadComments(postId as string);
+            } catch (error) {
+              console.error("Error deleting comment:", error);
+              Alert.alert("Error", "Failed to delete the comment.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   const isAuthor = user?.uid === post.authorId;
@@ -145,9 +194,13 @@ export default function PostDetailScreen() {
               onContentChange={setEditedContent}
             />
           ) : (
-            <Text>No post found</Text>
+            <LoadingSpinner />
           )}
-        <CommentList comments={post.comments || []} />
+        <CommentList 
+          comments={post.comments || []}
+          onEdit={handleEditComment}
+          onDelete={handleDeleteComment}
+        />
         <CommentInputForm 
           value={newComment} 
           onChangeText={setNewComment} 

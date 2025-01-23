@@ -1,11 +1,14 @@
 import React from 'react';
+import { CommentProvider } from 'src/api/context/CommentContext';
 import { PostProvider } from 'src/api/context/PostContext';
 import PostDetailScreen from 'src/components/threads/postDetail/PostDetailScreen';
 
 export default function postDetail() {
   return (
-    <PostProvider>
-      <PostDetailScreen />
-    </PostProvider>
+    <CommentProvider>
+      <PostProvider>   
+        <PostDetailScreen />
+      </PostProvider>
+    </CommentProvider>
   );
 }
