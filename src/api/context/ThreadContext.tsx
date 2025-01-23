@@ -102,11 +102,25 @@ export const PostCommentProvider: React.FC<{ children: ReactNode }> = ({ childre
         const data = doc.data();
         return {
           id: doc.id,
-          ...data,
-          createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
+          content: data.content || 'No Content',
           author: data.author || 'Anonymous',
+          authorId: data.authorId || '',
+          jobTitle: data.jobTitle || 'N/A',
+          createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
+          isAuthor: data.authorId === authState.user?.uid,
+          onEdit: () => console.log(`Edit comment: ${doc.id}`),
+          onDelete: () => console.log(`Delete comment: ${doc.id}`),
         };
       }) as Comment[];
+
+
+      commentList.forEach(post => {
+        if (post.createdAt?.seconds) {
+          post.createdAt = new Date(post.createdAt.seconds * 1000);
+        }
+      });
+
+      commentList.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
       dispatch({ type: 'SET_COMMENTS', payload: commentList });
     } catch (error) {
       console.error("Error fetching comments:", error);
