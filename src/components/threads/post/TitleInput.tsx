@@ -18,6 +18,7 @@ const TitleInput: React.FC<TitleInputProps> = ({ value, onChangeText, isFocused,
       onFocus={onFocus}
       onBlur={onBlur}
       isFocused={isFocused}
+      maxLength={50}
     />
   );
 };
@@ -25,11 +26,11 @@ const TitleInput: React.FC<TitleInputProps> = ({ value, onChangeText, isFocused,
 export default TitleInput;
 
 const StyledTextInput = styled.TextInput<{ isFocused: boolean }>`
-  width: 240px;
+  width: 280px;
   height: 40px;
   border-width: ${({ isFocused }) => (isFocused ? '2px' : '1px')};
   border-color: ${({ isFocused }) => (isFocused ? '#9082C3' : '#232323')};
-  border-radius: 20px;
-  padding: 8px;
+  border-radius: 15px;
+  padding: 10px;
   margin-bottom: 15px;
 `;

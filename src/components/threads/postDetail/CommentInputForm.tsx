@@ -7,6 +7,8 @@ interface CommentInputFormProps {
   onSubmit: () => void;
 }
 
+const MAX_CHARACTERS = 300;
+
 const CommentInputForm: React.FC<CommentInputFormProps> = ({ value, onChangeText, onSubmit }) => {
   return (
     <InputContainer>
@@ -14,6 +16,7 @@ const CommentInputForm: React.FC<CommentInputFormProps> = ({ value, onChangeText
         placeholder="Leave a comment"
         value={value}
         onChangeText={onChangeText}
+        maxLength={MAX_CHARACTERS}
       />
       <AddButton onPress={onSubmit}>
         <ButtonText>Add</ButtonText>
@@ -27,7 +30,8 @@ export default CommentInputForm;
 const InputContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-top: 10px;
+  padding: 0 15px;
+  margin: 0 10px 10px 10px;
 `;
 
 const CommentInput = styled.TextInput`
@@ -41,13 +45,13 @@ const CommentInput = styled.TextInput`
 `;
 
 const AddButton = styled.TouchableOpacity`
-  background-color: #9082c3;
+  background-color: #232323;
   padding: 12px 20px;
-  border-radius: 20px;
+  border-radius: 30px;
   margin-left: 10px;
 `;
 
 const ButtonText = styled.Text`
+  font-family: 'DMSans_500Medium';
   color: #ffffff;
-  font-weight: bold;
 `;

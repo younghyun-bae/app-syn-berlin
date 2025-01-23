@@ -16,6 +16,7 @@
     "lib": ["dom", "esnext"],
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
+    "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,

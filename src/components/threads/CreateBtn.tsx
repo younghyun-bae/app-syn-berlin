@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faPenNib } from '@fortawesome/free-solid-svg-icons';
@@ -6,13 +6,15 @@ import { useRouter } from 'expo-router';
 
 interface CreateBtnProps {
   testID?: string;
+  onPress: () => void;
 }
 
-const CreateButton: React.FC<CreateBtnProps> = ({ testID }) => {
+const CreateButton: React.FC<CreateBtnProps> = ({ testID, onPress }) => {
+
   const router = useRouter();
 
   return (
-    <Button onPress={() => router.push('/detail/post')} testID={testID}>
+    <Button onPress={onPress} testID={testID}>
       <FontAwesomeIcon icon={faPenNib} color="#FFFFFF" size={25} />
     </Button>
   );

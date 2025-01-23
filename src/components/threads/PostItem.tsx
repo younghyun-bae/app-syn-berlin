@@ -1,20 +1,13 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import styled from 'styled-components/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+
 import { useRouter } from 'expo-router';
 
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  likes: number;
-  author: string;
-  createdAt: Date;
-  replies: number;
-  likedByUser?: boolean;
-}
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faHeart, faCommentDots } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components/native';
+
+import { Post } from '../../types/postTypes';
 
 interface PostItemProps {
   post: Post;
@@ -30,6 +23,9 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
   return (
     <PostContainer style={index === 0 ? { marginTop: 20 } : {}} testID={testID}>
       <PostHeader>
+        <TouchableOpacity onPress={() => router.push(`/detail/postDetail?postId=${post.id}`)} style={{ flex: 1 }}>
+          <Title numberOfLines={1}>{post.title}</Title>
+        </TouchableOpacity>
         <Likes onPress={() => onLike(post.id, post.likes, post.likedByUser || false)} testID={`like-button-${index}`}>
           <FontAwesomeIcon
             icon={faHeart}
@@ -39,12 +35,20 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
         </Likes>
       </PostHeader>
       <TouchableOpacity onPress={() => router.push(`/detail/postDetail?postId=${post.id}`)}>
-        <Title>{post.title}</Title>
-        <AuthorName>{post.author}</AuthorName>
-        <Content>{post.content}</Content>
+        <AuthorName>
+          {post.author} {post.jobTitle ? `(${post.jobTitle})` : ''}
+        </AuthorName>
+        <Content numberOfLines={2}>{post.content}</Content>
       </TouchableOpacity>
       <PostFooter>
-        <Replies>{post.replies} replies</Replies>
+        <Replies>
+          <NumReplies>{post.replies}&nbsp;&nbsp;</NumReplies>
+          <FontAwesomeIcon
+              icon={faCommentDots}
+              color={'#C6C6C6'}
+            />
+        </Replies>
+
         <CreatedAt>{formatDate(post.createdAt)}</CreatedAt>
       </PostFooter>
     </PostContainer>
@@ -53,13 +57,11 @@ const PostItem: React.FC<PostItemProps> = ({ post, onLike, formatDate, index, te
 
 export default PostItem;
 
-// Styled Components
 const PostContainer = styled.View`
   background-color: #ffffff;
   max-height: 150px;
   margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 10px 20px;
   shadow-color: #000;
   shadow-opacity: 0.1;
   shadow-radius: 4px;
@@ -68,9 +70,8 @@ const PostContainer = styled.View`
 
 const PostHeader = styled.View`
   flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Likes = styled.TouchableOpacity`
@@ -87,14 +88,15 @@ const LikesText = styled.Text`
 const Title = styled.Text`
   font-size: 14px;
   color: #393B65;
-  margin-bottom: 5px;
   font-weight: bold;
+  margin-right: 10px;
+  overflow: hidden;
 `;
 
 const AuthorName = styled.Text`
   font-size: 10px;
   color: #7C7C7C;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 `;
 
 const Content = styled.Text`
@@ -111,7 +113,12 @@ const PostFooter = styled.View`
   margin-top: 10px;
 `;
 
-const Replies = styled.Text`
+const Replies = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const NumReplies = styled.Text`
   font-size: 12px;
   color: #7D7D7D;
 `;

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   const router = useRouter();
 
@@ -15,13 +16,14 @@ export const useAuth = () => {
       if (storedUser) {
         setUser(JSON.parse(storedUser))
       }
+      setInitialized(true);
     };
 
     loadUser();
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        console.log(JSON.stringify(user, null, 2));
+        // console.log(JSON.stringify(user, null, 2));
         setUser(currentUser);
         await AsyncStorage.setItem("@user", JSON.stringify(currentUser));
       } else {
@@ -34,5 +36,5 @@ export const useAuth = () => {
     return () => unsubscribe();
   }, [router]);
 
-  return user;
+  return initialized ? user : null;
 };

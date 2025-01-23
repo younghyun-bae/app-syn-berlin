@@ -1,79 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { db } from '../../src/api/firebase';
-import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from 'firebase/firestore';
-import { useLocalSearchParams, Stack } from 'expo-router';
-import styled from 'styled-components/native';
-import PostDetail from '../../src/components/threads/postDetail/PostDetail';
-import CommentList from '../../src/components/threads/postDetail/CommentList';
-import CommentInputForm from '../../src/components/threads/postDetail/CommentInputForm';
+import React from 'react';
+import { CommentProvider } from 'src/api/context/CommentContext';
+import { PostProvider } from 'src/api/context/PostContext';
+import PostDetailScreen from 'src/components/threads/postDetail/PostDetailScreen';
 
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: any;
-}
-
-export default function PostDetailScreen() {
-  const { postId } = useLocalSearchParams();
-  const [post, setPost] = useState<any>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-
-  const fetchComments = async () => {
-    const commentsRef = collection(db, 'comments');
-    const q = query(commentsRef, where('postId', '==', postId));
-    const commentSnapshot = await getDocs(q);
-    const commentList = commentSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Comment[];
-    setComments(commentList);
-  };
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      const postDoc = doc(db, 'posts', postId as string);
-      const postSnapshot = await getDoc(postDoc);
-      setPost(postSnapshot.data());
-    };
-
-    fetchPost();
-    fetchComments();
-  }, [postId]);
-
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
-
-    const commentsRef = collection(db, 'comments');
-    await addDoc(commentsRef, {
-      postId,
-      content: newComment,
-      createdAt: serverTimestamp(),
-    });
-    setNewComment('');
-    fetchComments();
-    console.log('New comment is added');
-  };
-
+export default function postDetail() {
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerTitle: 'Detail',
-          headerBackTitle: 'List',
-        }}
-      />
-      <Container>
-        {post && <PostDetail title={post.title} content={post.content} />}
-        <CommentList comments={comments} />
-        <CommentInputForm value={newComment} onChangeText={setNewComment} onSubmit={handleAddComment} />
-      </Container>
-    </>
+    <CommentProvider>
+      <PostProvider>   
+        <PostDetailScreen />
+      </PostProvider>
+    </CommentProvider>
   );
 }
-
-const Container = styled.View`
-  flex: 1;
-  background-color: #f7f7f7;
-  padding: 20px;
-`;
