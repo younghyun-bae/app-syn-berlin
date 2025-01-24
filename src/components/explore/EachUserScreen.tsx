@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useUsers } from 'src/api/context/UsersContext';
 import styled from 'styled-components/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
+import { faBookmark, faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import ChatRequestScreen from './ChatRequestScreen';
 
@@ -91,12 +91,12 @@ const EachUserScreen: React.FC = () => {
 
 const EachUserContainer = styled.View`
   flex: 1;
-  padding: 25px;
   background-color: #FFF;
 `;
 
 const ScrollContainer = styled.ScrollView`
   flex: 1;
+  padding: 25px;
 `;
 
 const ProfileImage = styled.Image`

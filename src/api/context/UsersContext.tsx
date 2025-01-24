@@ -8,12 +8,14 @@ interface User {
   displayName: string;
   email: string;
   jobTitle: string;
+  interests: string[];
   aboutMe: string;
   location: string;
   mainField: string;
   languages: string;
   portfolio: string;
   proudWork: string;
+  profilePic?: string;
 }
 
 interface UsersState {

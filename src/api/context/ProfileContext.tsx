@@ -19,6 +19,7 @@ interface Profile {
   proudWork?: string;
   portfolio?: string;
   languages?: string;
+  profilePic?: string;
 }
 
 const initialState: ProfileState = {
