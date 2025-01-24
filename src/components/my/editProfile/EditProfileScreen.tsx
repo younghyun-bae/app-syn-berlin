@@ -23,6 +23,7 @@ const EditProfileScreen: React.FC = () => {
   const { user } = authState;
   const router = useRouter();
 
+  const [profilePic, setProfilePic] = useState(user?.photoURL || '')
   const [displayName, setDisplayName] = useState(profile?.displayName || '');
   const [location, setLocation] = useState(profile?.location || '');
   const [jobTitle, setJobTitle] = useState(profile?.jobTitle || '');
@@ -38,6 +39,7 @@ const EditProfileScreen: React.FC = () => {
       try {
         const userRef = doc(db, 'users', user.uid);
         await updateDoc(userRef, {
+          profilePic,
           displayName,
           location,
           jobTitle,
@@ -51,6 +53,7 @@ const EditProfileScreen: React.FC = () => {
         dispatch({
           type: 'UPDATE_PROFILE',
           payload: {
+            profilePic,
             displayName,
             location,
             jobTitle,

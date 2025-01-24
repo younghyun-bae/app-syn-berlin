@@ -19,6 +19,7 @@ interface Profile {
   proudWork?: string;
   portfolio?: string;
   languages?: string;
+  profilePic?: string;
 }
 
 const initialState: ProfileState = {
@@ -48,15 +49,16 @@ const ProfileContext = createContext<{
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(profileReducer, initialState);
   const { state: authState } = useAuth();
+  const { user } = authState; 
 
   useEffect(() => {
-    if (authState.user) {
-      const userRef = doc(db, 'users', authState.user.uid);
+    if (user) {
+      const userRef = doc(db, 'users', user.uid);
       const unsubscribe = onSnapshot(userRef, (docSnap) => {
         if (docSnap.exists()) {
           dispatch({ type: 'SET_PROFILE', payload: docSnap.data() as Profile });
         } else {
-          console.warn("No profile found for user:", authState.user?.uid);
+          console.warn("No profile found for user:", user?.uid);
         }
       }, (error) => {
         console.error("Error fetching profile:", error);
@@ -64,7 +66,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
 
       return () => unsubscribe();
     }
-  }, [authState.user]);
+  }, [user]);
 
   return (
     <ProfileContext.Provider value={{ state, dispatch }}>
