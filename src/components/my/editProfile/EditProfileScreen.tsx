@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
-
-import { doc, updateDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from 'src/api/firebase';
 import { useProfile } from 'src/api/context/ProfileContext';
+import { Profile } from 'src/api/context/ProfileContext';
 import { useAuth } from 'src/api/context/AuthContext';
-
 import { useRouter } from 'expo-router';
 
 import FormItem from './FormItem';
@@ -16,6 +14,8 @@ import ButtonGroup from './ButtonGroup';
 
 import styled from 'styled-components/native';
 
+import { Alert } from 'react-native';
+
 const EditProfileScreen: React.FC = () => {
   const { state, dispatch } = useProfile();
   const { state: authState } = useAuth();
@@ -23,119 +23,121 @@ const EditProfileScreen: React.FC = () => {
   const { user } = authState;
   const router = useRouter();
 
-  const [profilePic, setProfilePic] = useState(user?.photoURL || '')
-  const [displayName, setDisplayName] = useState(profile?.displayName || '');
-  const [location, setLocation] = useState(profile?.location || '');
-  const [jobTitle, setJobTitle] = useState(profile?.jobTitle || '');
-  const [mainField, setMainField] = useState(profile?.mainField || '');
-  const [aboutMe, setAboutMe] = useState(profile?.aboutMe || '');
-  const [interests, setInterests] = useState<string[]>(profile?.interests || []);
-  const [proudWork, setProudWork] = useState(profile?.proudWork || '');
-  const [portfolio, setPortfolio] = useState(profile?.portfolio || '');
-  const [languages, setLanguages] = useState(profile?.languages || '');
+  const [localProfile, setLocalProfile] = useState<Profile>({
+    ...profile,
+    interests: profile?.interests || [],
+    languages: profile?.languages || [],
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setLocalProfile({ ...profile, interests: profile.interests || [], languages: profile.languages || [] });
+    }
+  }, [profile]);
 
   const handleSave = async () => {
     if (user) {
       try {
         const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
-          profilePic,
-          displayName,
-          location,
-          jobTitle,
-          mainField,
-          aboutMe,
-          interests,
-          proudWork,
-          portfolio,
-          languages,
-        });
-        dispatch({
-          type: 'UPDATE_PROFILE',
-          payload: {
-            profilePic,
-            displayName,
-            location,
-            jobTitle,
-            mainField,
-            aboutMe,
-            interests,
-            proudWork,
-            portfolio,
-            languages,
-          },
-        });
+        await setDoc(userRef, { ...localProfile }, { merge: true });
+        dispatch({ type: 'UPDATE_PROFILE', payload: localProfile });
         console.log('Profile edited successfully');
-        router.push('/tab_4');
+        router.replace('/tab_4');
+        router.back();
       } catch (error) {
         console.error('EditProfileScreen: Error updating profile:', error);
+        Alert.alert("Please Try Again" ,"There was an error saving your profile.");
       }
     } else {
       console.log('EditProfileScreen: User is not authenticated');
-      
+      Alert.alert("User not found", "You must be logged in to save your profile.");
     }
   };
 
   const handleCancel = () => {
-    console.log('Cancel button clicked');
     router.back();
+  };
+
+  const handleChange = (key: keyof Profile, value: any) => {
+    setLocalProfile((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
     <Container>
-      <ScrollView>
+      <EditScrollContainer>
         <ProfileImgUpload onUpload={() => {}} />
 
-        <FormItem label="Name" value={displayName} onChangeText={setDisplayName} />
+        <FormItem 
+          label="Name" 
+          value={localProfile.displayName || ''} 
+          placeholder="First Name, Surname" 
+          onChangeText={(text) => handleChange('displayName', text)} 
+        />
         <FormItem 
           label="Location" 
-          value={location} 
-          placeholder="Based in"
-          onChangeText={setLocation} 
+          value={localProfile.location || ''} 
+          placeholder="City or Area You're based in" 
+          onChangeText={(text) => handleChange('location', text)} 
         />
-        <FormItem label="Job Title" value={jobTitle} placeholder="Add Your Job Title" onChangeText={setJobTitle} />
-        <FormItem label="Focused Main Field" value={mainField} placeholder="Add Your Main Field" onChangeText={setMainField} />
-
-        <InterestSelector interests={interests} toggleInterest={(interest) => {
-          setInterests((prev) => {
-            return prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest];
-          });
-        }} />
-
-        <FormItem
-          label="About Me"
-          value={aboutMe}
-          placeholder="Tell the people about yourself"
-          onChangeText={setAboutMe}
-          multiline
+        <FormItem 
+          label="Job Title" 
+          value={localProfile.jobTitle || ''} 
+          placeholder="Add Your Job Title" 
+          onChangeText={(text) => handleChange('jobTitle', text)} 
         />
+        <FormItem 
+          label="Focused Main Field" 
+          value={localProfile.mainField || ''} 
+          placeholder="Main Field You Focus on" 
+          onChangeText={(text) => handleChange('mainField', text)} />
 
-        <FormItem
-          label="Work You're Most Proud Of"
-          value={proudWork}
-          placeholder="Add URL"
-          onChangeText={setProudWork}
+        <InterestSelector
+          interests={localProfile.interests || []}
+          toggleInterest={(interest: string) => {
+            handleChange('interests', localProfile.interests?.includes(interest)
+              ? localProfile.interests.filter((i: string) => i !== interest)
+              : [...(localProfile.interests as []), interest]
+            );
+          }}
         />
 
-        <SocialMediaInput value={portfolio} onChangeText={setPortfolio} />
+        <FormItem label="About Me" value={localProfile.aboutMe || ''} placeholder="Tell the people about yourself" onChangeText={(text) => handleChange('aboutMe', text)} multiline />
 
-        <FormItem
-          label="Languages"
-          value={languages}
-          placeholder="Add Languages"
-          onChangeText={setLanguages}
+        <FormItem 
+          label="Work You're Most Proud Of" 
+          value={localProfile.proudWork || ''} 
+          placeholder="Add URL" 
+          onChangeText={(text) => handleChange('proudWork', text)} 
         />
 
-        <ButtonGroup onSave={handleSave} onCancel={handleCancel} />
-      </ScrollView>
+        <SocialMediaInput 
+          value={localProfile.portfolio || ''} 
+          onChangeText={(text) => handleChange('portfolio', text)} 
+        />
+
+        <FormItem 
+          label="Languages" 
+          value={localProfile.languages?.join(', ') || ''} 
+          placeholder="Add Languages" onChangeText={(text) => handleChange('languages', text.split(',').map(lang => lang.trim()))} 
+        />
+      </EditScrollContainer>
+      <ButtonGroup 
+        onSave={handleSave} 
+        onCancel={handleCancel} 
+      />
     </Container>
   );
 };
 
 const Container = styled.View`
   flex: 1;
-  padding: 20px;
   background-color: #fff;
+  padding: 0 10px 50px 10px;
+`;
+
+const EditScrollContainer = styled.ScrollView`
+  flex: 1;
+  padding: 10px 25px;
 `;
 
 export default EditProfileScreen;

@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext, useEffect, ReactNode } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore'; // Import setDoc
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 
@@ -7,7 +7,7 @@ interface ProfileState {
   profile: Profile | null;
 }
 
-interface Profile {
+export interface Profile {
   photoURL?: string;
   email?: string;
   displayName?: string;
@@ -18,7 +18,7 @@ interface Profile {
   interests?: string[];
   proudWork?: string;
   portfolio?: string;
-  languages?: string;
+  languages?: string[];
   profilePic?: string;
 }
 
@@ -54,17 +54,34 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   useEffect(() => {
     if (user) {
       const userRef = doc(db, 'users', user.uid);
-      const unsubscribe = onSnapshot(userRef, (docSnap) => {
+      const unsubscribe = onSnapshot(userRef, async (docSnap) => {
         if (docSnap.exists()) {
           dispatch({ type: 'SET_PROFILE', payload: docSnap.data() as Profile });
         } else {
           console.warn("No profile found for user:", user?.uid);
+          const defaultProfile: Profile = {
+            email: user.email || '',
+            profilePic: user.photoURL || '',
+            displayName: user.displayName || '',
+            jobTitle: '',
+            location: '',
+            mainField: '',
+            aboutMe: '',
+            interests: [],
+            proudWork: '',
+            portfolio: '',
+            languages: [],
+          };
+          await setDoc(userRef, defaultProfile);
+          dispatch({ type: 'SET_PROFILE', payload: defaultProfile });
         }
       }, (error) => {
         console.error("Error fetching profile:", error);
       });
 
       return () => unsubscribe();
+    } else {
+      dispatch({ type: 'SET_PROFILE', payload: null });
     }
   }, [user]);
 
