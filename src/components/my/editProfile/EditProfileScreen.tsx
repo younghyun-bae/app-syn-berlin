@@ -26,12 +26,16 @@ const EditProfileScreen: React.FC = () => {
   const [localProfile, setLocalProfile] = useState<Profile>({
     ...profile,
     interests: profile?.interests || [],
-    languages: profile?.languages || [],
+    languages: Array.isArray(profile?.languages) ? profile.languages : [],
   });
 
   useEffect(() => {
     if (profile) {
-      setLocalProfile({ ...profile, interests: profile.interests || [], languages: profile.languages || [] });
+      setLocalProfile({ 
+        ...profile, 
+        interests: profile.interests || [], 
+        languages: Array.isArray(profile?.languages) ? profile.languages : [],
+      });
     }
   }, [profile]);
 
