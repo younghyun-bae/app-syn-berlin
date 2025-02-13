@@ -19,7 +19,7 @@ interface ProfileHeaderProps {
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => (
     <HeaderContainer>
         <ImageContainer>
-            <ProfileImage source={{ uri: profile.profilePic || require('../../../assets/images/default-profile-image.png') }} />
+            <ProfileImage source={{ uri: profile.profilePic || require('../../../assets/images/default-profile-img.png') }} />
         </ImageContainer>
         <InfoContainer>
             <ProfileName>{profile.displayName || profile.email}</ProfileName>

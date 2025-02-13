@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, View, Text, ImageBackground, Pressable } from 'react-native';
+import { FlatList, StyleSheet, ImageBackground, Pressable } from 'react-native';
 import { useUsers } from 'src/api/context/UsersContext';
 import styled from 'styled-components/native';
 import { useRouter } from 'expo-router';
 
 const ExploreScreen: React.FC = () => {
-  const { users } = useUsers().state;
+  const { users, defaultImgUrl } = useUsers().state;
   const router = useRouter();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
@@ -31,7 +31,7 @@ const ExploreScreen: React.FC = () => {
             onPressOut={handlePressOut}
           >
             <ImageBackground
-              source={{ uri: item.profilePic }} // should be implemented
+              source={{ uri: item.profilePic || defaultImgUrl }} // should be implemented
               style={styles.imageBackground}
               imageStyle={styles.imageStyle}
             >
@@ -57,7 +57,7 @@ const ExploreScreen: React.FC = () => {
 const ExploreContainer = styled.View`
   flex: 1;
   padding: 10px;
-  background-color: #e2e2e2;
+  background-color: rgba(229, 229, 229, 0.2);
 `;
 
 const TitleContainer = styled.View<{ isPressed: boolean }>`
