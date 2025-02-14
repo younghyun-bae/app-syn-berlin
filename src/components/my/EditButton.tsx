@@ -11,8 +11,7 @@ interface EditButtonProps {
 const EditButton = ({ onPress }: EditButtonProps) => (
     <ButtonContainer>
         <EditButtonStyled onPress={onPress}>
-            <FontAwesomeIcon icon={faPenToSquare} color="#FFFFFF" size={18} />
-            <EditButtonText>Edit Profile</EditButtonText>
+            <FontAwesomeIcon icon={faPenToSquare} color="#FFFFFF" size={28} />
         </EditButtonStyled>
     </ButtonContainer>
 );
@@ -26,16 +25,10 @@ const ButtonContainer = styled.View`
 `;
 
 const EditButtonStyled = styled(TouchableOpacity)`
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
     background-color: #232323;
-    padding: 15px 20px;
-    border-radius: 30px;
-    flex-direction: row;
-    align-items: center;
-`;
-
-const EditButtonText = styled.Text`
-    color: #FFFFFF;
-    font-family: 'DMSans_500Medium';
-    font-size: 16px;
-    margin-left: 10px;
+    padding: 15px;
+    border-radius: 50px;
 `;

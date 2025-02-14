@@ -20,16 +20,19 @@ interface User {
 
 interface UsersState {
   users: User[];
+  defaultImgUrl: string;
 }
 
 type Action =
   | { type: 'SET_USERS'; payload: User[] }
   | { type: 'ADD_USER'; payload: User }
   | { type: 'UPDATE_USER'; payload: User }
-  | { type: 'REMOVE_USER'; payload: string };
+  | { type: 'REMOVE_USER'; payload: string }
+  | { type: 'SET_DEFAULT_IMG_URL'; payload: string };
 
 const initialState: UsersState = {
   users: [],
+  defaultImgUrl: '/Users/younghyun/projects/app-syn-berlin/assets/images/default-profile-img.png',
 };
 
 const usersReducer = (state: UsersState, action: Action): UsersState => {
@@ -47,6 +50,8 @@ const usersReducer = (state: UsersState, action: Action): UsersState => {
       };
     case 'REMOVE_USER':
       return { ...state, users: state.users.filter((user) => user.uid !== action.payload) };
+    case 'SET_DEFAULT_IMG_URL':
+      return { ...state, defaultImgUrl: action.payload };
     default:
       return state;
   }

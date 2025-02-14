@@ -10,7 +10,7 @@ import ChatRequestScreen from './ChatRequestScreen';
 
 const EachUserScreen: React.FC = () => {
   const { uid } = useLocalSearchParams(); 
-  const { users } = useUsers().state;
+  const { users, defaultImgUrl } = useUsers().state;
   const user = users.find((u) => u.uid === uid);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -32,7 +32,7 @@ const EachUserScreen: React.FC = () => {
   return (
     <EachUserContainer>
       <ScrollContainer>
-        <ProfileImage source={{ uri: user.profilePic }} />
+        <ProfileImage source={{ uri: user.profilePic || defaultImgUrl }} />
         <Header>
           <DisplayName>{user.displayName || "N/A"}</DisplayName>
           <LocationContainer>
@@ -175,13 +175,13 @@ const InterestTag = styled.View`
 
 const InterestTagText = styled.Text`
   color: #232323;
-  font-family: 'DMSans_300Regular';
+  font-family: 'DMSans_400Regular';
 `;
 
 const RequestBtn = styled.TouchableOpacity`
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 30px;
+  right: 30px;
   background-color: #232323;
   padding: 15px;
   border-radius: 50px;
